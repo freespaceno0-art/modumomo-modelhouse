@@ -18,15 +18,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // 잔여일 계산 및 경고 표시
     calculateRemainingDays();
     
-    // Kakao Maps API 로딩 상태 확인 및 지속적 모니터링
+    // Kakao Maps API 로딩 상태 확인
     checkKakaoMapsAPI();
-    
-    // API 상태를 지속적으로 모니터링 (5초마다)
-    setInterval(() => {
-        if (typeof kakao !== 'undefined' && kakao.maps && kakao.maps.services) {
-            console.log('🔄 Kakao Maps API 상태 확인 중...');
-        }
-    }, 5000);
 });
 
 // Kakao Maps API 로딩 상태 확인
@@ -51,7 +44,7 @@ function checkKakaoMapsAPI() {
                 clearInterval(checkKakao);
                 console.log('✅ Kakao Maps API 로딩 완료 - 주소 검색 기능 사용 가능');
             }
-        }, 50); // 50ms마다 체크
+        }, 100); // 100ms마다 체크
         
         // 15초 후 타임아웃
         setTimeout(() => {
