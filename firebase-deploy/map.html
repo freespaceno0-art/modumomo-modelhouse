@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>모두의 모델하우스 - 지도</title>
+    <link rel="stylesheet" th:href="@{/css/map.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Top Right Auth Buttons -->
+    <div class="top-auth-buttons">
+        <a th:if="${!isLoggedIn}" href="/login" class="auth-btn">로그인</a>
+        <a th:if="${!isLoggedIn}" href="/signup" class="auth-btn">회원가입</a>
+        <span th:if="${isLoggedIn && !isAdmin}" class="separator">|</span>
+        <a th:if="${isLoggedIn && isAdmin}" href="/admin" class="auth-btn admin-link">관리자</a>
+        <div th:if="${isLoggedIn}" class="user-info">
+            <span th:text="${currentUser?.username}">사용자</span>
+            <a href="/logout" class="auth-btn logout-btn">로그아웃</a>
+        </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-container">
+        <div class="search-input-container">
+            <input type="text" class="search-input" placeholder="지역명 또는 모델하우스 이름을 입력하세요...">
+            <button class="search-btn">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Map Container -->
+    <div class="map-container">
+        <div id="map"></div>
+        
+        <!-- Model House Info Panel -->
+        <div class="modelhouse-info" id="modelhouseInfo">
+            <button class="close-info" onclick="closeInfo()">&times;</button>
+            <h3><i class="fas fa-home"></i> <span id="infoTitle">모델하우스 정보</span></h3>
+            
+            <!-- QR 코드 섹션 -->
+            <div class="qr-section">
+                <img id="infoQrCode" src="https://via.placeholder.com/150x150/000000/ffffff?text=QR" alt="QR 코드" class="qr-code">
+            </div>
+            
+            <!-- 기본 정보 섹션 -->
+            <div class="basic-info">
+                <div class="info-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span id="infoAddress">주소: 서울특별시 강남구</span>
+                    <button class="copy-btn" onclick="copyAddress()">주소복사</button>
+                </div>
+                
+                <div class="info-item">
+                    <i class="fas fa-phone"></i>
+                    <span id="infoPhone">전화번호: 02-1234-5678</span>
+                </div>
+                
+                <div class="info-item">
+                    <i class="fas fa-building"></i>
+                    <span id="infoType">유형: 단독주택</span>
+                </div>
+                
+                <div class="info-item">
+                    <i class="fas fa-dollar-sign"></i>
+                    <span id="infoPrice">가격: 문의</span>
+                </div>
+                
+                <div class="info-item description">
+                    <i class="fas fa-info-circle"></i>
+                    <span id="infoDescription">설명: 모델하우스 상세 설명</span>
+                </div>
+            </div>
+            
+
+            
+            <!-- 이미지 갤러리 섹션 -->
+            <div class="image-gallery" id="infoImageGallery">
+                <h4>모델하우스 이미지</h4>
+                <div class="gallery-images">
+                    <!-- 이미지들이 동적으로 추가됩니다 -->
+                </div>
+            </div>
+            
+            <!-- 광고 섹션 -->
+            <div class="advertisement-section">
+                <h4>해당 광고:</h4>
+                <div class="ad-banners">
+                    <div class="ad-banner">
+                        <img src="https://via.placeholder.com/250x100/ff6b6b/ffffff?text=광고+배너+1" alt="광고 1">
+                        <p>KPOP DEMON HUNTERS GOLDEN OFFICIAL LYRIC VIDEO</p>
+                    </div>
+                    <div class="ad-banner">
+                        <img src="https://via.placeholder.com/250x100/4ecdc4/ffffff?text=광고+배너+2" alt="광고 2">
+                        <p>KPOP DEMON HUNTERS GOLDEN OFFICIAL LYRIC VIDEO</p>
+                    </div>
+                    <div class="ad-banner">
+                        <img src="https://via.placeholder.com/250x100/45b7d1/ffffff?text=광고+배너+3" alt="광고 3">
+                        <p>KPOP DEMON HUNTERS GOLDEN OFFICIAL LYRIC VIDEO</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 이미지 모달 -->
+    <div id="imageModal" class="image-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <img id="modalImage" src="" alt="원본 이미지">
+        </div>
+    </div>
+            
+    </div>
+
+    <!-- Kakao Maps API -->
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=91cb0bd7449dd781a29428e986969795"></script>
+    <script th:src="@{/js/map.js}"></script>
+</body>
+</html>
