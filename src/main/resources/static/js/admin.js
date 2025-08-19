@@ -364,37 +364,37 @@ function removeLink(button) {
 function saveHouse() {
     const formData = new FormData();
     
-         // 기본 정보
-     formData.append('name', document.getElementById('houseName').value);
-     formData.append('address', document.getElementById('houseAddress').value);
-     formData.append('phone', document.getElementById('housePhone').value);
-     formData.append('category', document.getElementById('houseCategory').value);
-     
-     // 위도/경도는 주소 검색으로 자동 설정된 값 사용
-     if (window.houseCoordinates && window.houseCoordinates.latitude && window.houseCoordinates.longitude) {
-         formData.append('latitude', window.houseCoordinates.latitude);
-         formData.append('longitude', window.houseCoordinates.longitude);
-     } else {
-         alert('주소를 검색하여 위치를 확인해주세요.');
-         return;
-     }
-     
-     formData.append('registrationDays', document.getElementById('registrationDays').value);
+    // 기본 정보
+    formData.append('name', document.getElementById('houseName').value);
+    formData.append('address', document.getElementById('houseAddress').value);
+    formData.append('phone', document.getElementById('housePhone').value);
+    formData.append('category', document.getElementById('houseCategory').value);
     
-         // 타입 및 분양가 정보
-     const typePriceItems = document.querySelectorAll('.type-price-item');
-     const types = [];
-     const prices = [];
-     
-     typePriceItems.forEach(item => {
-         const type = item.querySelector('input[name="houseType[]"]').value;
-         const price = item.querySelector('input[name="housePrice[]"]').value;
-         
-         if (type && price) {
-             types.push(type);
-             prices.push(price);
-         }
-     });
+    // 위도/경도는 주소 검색으로 자동 설정된 값 사용
+    if (window.houseCoordinates && window.houseCoordinates.latitude && window.houseCoordinates.longitude) {
+        formData.append('latitude', window.houseCoordinates.latitude);
+        formData.append('longitude', window.houseCoordinates.longitude);
+    } else {
+        alert('주소를 검색하여 위치를 확인해주세요.');
+        return;
+    }
+    
+    formData.append('registrationDays', document.getElementById('registrationDays').value);
+    
+    // 타입 및 분양가 정보
+    const typePriceItems = document.querySelectorAll('.type-price-item');
+    const types = [];
+    const prices = [];
+    
+    typePriceItems.forEach(item => {
+        const type = item.querySelector('input[name="houseType[]"]').value;
+        const price = item.querySelector('input[name="housePrice[]"]').value;
+        
+        if (type && price) {
+            types.push(type);
+            prices.push(price);
+        }
+    });
     
     if (types.length === 0) {
         alert('최소 하나의 타입과 분양가를 입력해주세요.');
@@ -436,11 +436,75 @@ function saveHouse() {
     // API 호출 (실제 구현 시)
     console.log('모델하우스 저장:', Object.fromEntries(formData));
     
+    // 새로운 모델하우스를 목록에 추가
+    addHouseToList({
+        id: Date.now(), // 임시 ID (실제로는 서버에서 받아야 함)
+        name: document.getElementById('houseName').value,
+        address: document.getElementById('houseAddress').value,
+        phone: document.getElementById('housePhone').value,
+        category: document.getElementById('houseCategory').value,
+        type: types[0] + '타입',
+        price: prices[0],
+        registrationDays: days
+    });
+    
     // 성공 메시지 표시
     showMessage('모델하우스가 성공적으로 저장되었습니다.', 'success');
     
     // 폼 초기화
     resetForm();
+}
+
+// 모델하우스를 목록에 추가하는 함수
+function addHouseToList(houseData) {
+    const houseList = document.querySelector('.house-list');
+    const houseItem = document.createElement('div');
+    houseItem.className = 'house-item';
+    
+    // 현재 날짜로부터 등록 기간 계산
+    const endDate = new Date();
+    endDate.setDate(endDate.getDate() + houseData.registrationDays);
+    const endDateStr = endDate.toISOString().split('T')[0];
+    
+    houseItem.innerHTML = `
+        <div class="house-info">
+            <div class="house-name">${houseData.name}</div>
+            <div class="house-address">${houseData.address}</div>
+            <div class="house-details">
+                <span class="house-category">${houseData.category}</span>
+                <span class="house-type">${houseData.type}</span>
+                <span class="house-price">${houseData.price}</span>
+                <span class="remaining-days" data-end-date="${endDateStr}">잔여 ${houseData.registrationDays}일</span>
+            </div>
+            <div class="house-status" style="margin-top: 0.5rem;">
+                <span class="status-badge active">활성</span>
+                <span class="house-phone">${houseData.phone}</span>
+            </div>
+        </div>
+        <div class="house-actions">
+            <button class="btn btn-primary" onclick="editHouse(${houseData.id})">
+                <i class="fas fa-edit"></i> 수정
+            </button>
+            <button class="btn btn-danger" onclick="removeHouse(${houseData.id})">
+                <i class="fas fa-trash"></i> 삭제
+            </button>
+            <button class="btn btn-info" onclick="goToMap(${houseData.id}, '${houseData.name}', ${window.houseCoordinates.latitude}, ${window.houseCoordinates.longitude})">
+                <i class="fas fa-map-marker-alt"></i> 지도에서 보기
+            </button>
+            <div class="extend-section">
+                <input type="number" class="extend-days" id="extendDays${houseData.id}" placeholder="연장일수" min="1" max="999" style="width: 80px;">
+                <button class="btn btn-success" onclick="extendHouse(${houseData.id})">
+                    <i class="fas fa-calendar-plus"></i> 연장
+                </button>
+            </div>
+        </div>
+    `;
+    
+    // 목록의 맨 위에 추가
+    houseList.insertBefore(houseItem, houseList.firstChild.nextSibling);
+    
+    // 잔여일 계산 및 경고 표시 업데이트
+    calculateRemainingDays();
 }
 
 // 개인정보 처리방침 저장

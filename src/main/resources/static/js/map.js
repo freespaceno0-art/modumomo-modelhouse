@@ -22,6 +22,21 @@ async function loadModelHouses() {
         }
     } catch (error) {
         console.error('모델하우스 데이터 로드 중 오류:', error);
+        // 오류 발생 시 더미 데이터로 테스트
+        modelHouses = [
+            {
+                id: 1,
+                name: '테스트 모델하우스',
+                address: '서울특별시 강남구',
+                latitude: 37.5665,
+                longitude: 126.9780,
+                phone: '02-1234-5678',
+                category: '아파트',
+                type: '3타입',
+                price: '5억원'
+            }
+        ];
+        console.log('더미 데이터로 테스트:', modelHouses);
     }
 }
 
@@ -37,12 +52,8 @@ async function initMap() {
     
     console.log('map 컨테이너 찾음:', container);
     
-    // Kakao Maps API가 로드되었는지 확인
-    if (typeof kakao === 'undefined' || !kakao.maps) {
-        console.error('Kakao Maps API가 로드되지 않았습니다');
-        showMapError();
-        return;
-    }
+    // Kakao Maps API가 로드되었는지 확인하고 대기
+    await waitForKakaoMaps();
     
     const options = {
         center: new kakao.maps.LatLng(37.5665, 126.9780), // 서울시청
@@ -115,6 +126,28 @@ async function initMap() {
     }
 }
 
+// Kakao Maps API 로딩 대기
+function waitForKakaoMaps() {
+    return new Promise((resolve, reject) => {
+        const checkKakao = () => {
+            if (typeof kakao !== 'undefined' && kakao.maps) {
+                console.log('✅ Kakao Maps API 로딩 완료');
+                resolve();
+            } else {
+                console.log('⏳ Kakao Maps API 로딩 대기 중...');
+                setTimeout(checkKakao, 100);
+            }
+        };
+        
+        // 30초 타임아웃
+        setTimeout(() => {
+            reject(new Error('Kakao Maps API 로딩 타임아웃'));
+        }, 30000);
+        
+        checkKakao();
+    });
+}
+
 // 지도 로드 오류 시 표시할 메시지
 function showMapError() {
     const container = document.getElementById('map');
@@ -136,17 +169,28 @@ function addModelHouseMarkers() {
     markers.forEach(marker => marker.setMap(null));
     markers = [];
     
+    console.log('마커 추가 시작, 모델하우스 수:', modelHouses.length);
+    
     modelHouses.forEach(house => {
-        // 마커 생성 - ModelHouse 엔티티 필드명과 일치
+        // 위도/경도 확인
+        const lat = house.latitude || house.lat;
+        const lng = house.longitude || house.lng;
+        
+        if (!lat || !lng) {
+            console.warn('위도/경도 정보가 없는 모델하우스:', house);
+            return;
+        }
+        
+        // 마커 생성
         const marker = new kakao.maps.Marker({
-            position: new kakao.maps.LatLng(house.latitude, house.longitude),
+            position: new kakao.maps.LatLng(lat, lng),
             map: map
         });
         
         // 마커에 클릭 이벤트 추가
         kakao.maps.event.addListener(marker, 'click', function() {
             // 해당 위치로 최대 확대
-            const position = new kakao.maps.LatLng(house.latitude, house.longitude);
+            const position = new kakao.maps.LatLng(lat, lng);
             map.setCenter(position);
             map.setLevel(1); // 최대 확대 (레벨 1)
             
@@ -161,8 +205,9 @@ function addModelHouseMarkers() {
         });
         
         // 마커에 툴팁 추가
+        const houseName = house.name || house.houseName || '모델하우스';
         const infowindow = new kakao.maps.InfoWindow({
-            content: `<div style="padding:5px;font-size:12px;">${house.houseName}</div>`
+            content: `<div style="padding:5px;font-size:12px;">${houseName}</div>`
         });
         
         kakao.maps.event.addListener(marker, 'mouseover', function() {
@@ -175,38 +220,66 @@ function addModelHouseMarkers() {
         
         // 마커 배열에 저장
         markers.push(marker);
+        
+        console.log(`마커 추가됨: ${houseName} (${lat}, ${lng})`);
     });
+    
+    console.log(`총 ${markers.length}개의 마커가 추가되었습니다.`);
 }
 
 // 모델하우스 정보 표시
 function showModelHouseInfo(house) {
     const infoPanel = document.getElementById('modelhouseInfo');
     
-    // 정보 업데이트 - ModelHouse 엔티티 필드명과 일치
-    document.getElementById('infoTitle').textContent = `${house.houseName} (${house.houseCategory})`;
-    document.getElementById('infoAddress').textContent = house.houseAddress;
-    document.getElementById('infoPhone').textContent = house.housePhone;
-    document.getElementById('infoType').textContent = house.houseCategory;
-    document.getElementById('infoPrice').textContent = house.housePrice;
-    document.getElementById('infoDescription').textContent = house.houseDescription;
+    // 정보 업데이트 - 필드명을 통일하고 안전하게 처리
+    const titleElement = document.getElementById('infoTitle');
+    const addressElement = document.getElementById('infoAddress');
+    const phoneElement = document.getElementById('infoPhone');
+    const typeElement = document.getElementById('infoType');
+    const priceElement = document.getElementById('infoPrice');
+    const descriptionElement = document.getElementById('infoDescription');
     
-    // QR 코드 업데이트
-    const qrCodeImg = document.getElementById('infoQrCode');
-    if (qrCodeImg) {
-        qrCodeImg.src = house.qrCode;
-        qrCodeImg.alt = `${house.name} QR 코드`;
+    if (titleElement) {
+        titleElement.textContent = house.name || house.houseName || '모델하우스 정보';
     }
     
-    // 이미지 갤러리 업데이트
+    if (addressElement) {
+        addressElement.textContent = `주소: ${house.address || house.houseAddress || '주소 정보 없음'}`;
+    }
+    
+    if (phoneElement) {
+        phoneElement.textContent = `전화번호: ${house.phone || house.housePhone || '연락처 정보 없음'}`;
+    }
+    
+    if (typeElement) {
+        typeElement.textContent = `유형: ${house.category || house.houseCategory || '유형 정보 없음'}`;
+    }
+    
+    if (priceElement) {
+        priceElement.textContent = `가격: ${house.price || house.housePrice || '가격 정보 없음'}`;
+    }
+    
+    if (descriptionElement) {
+        descriptionElement.textContent = `설명: ${house.description || house.houseDescription || '설명 정보 없음'}`;
+    }
+    
+    // QR 코드 업데이트 (있는 경우에만)
+    const qrCodeImg = document.getElementById('infoQrCode');
+    if (qrCodeImg && house.qrCode) {
+        qrCodeImg.src = house.qrCode;
+        qrCodeImg.alt = `${house.name || house.houseName || '모델하우스'} QR 코드`;
+    }
+    
+    // 이미지 갤러리 업데이트 (있는 경우에만)
     const imageGallery = document.getElementById('infoImageGallery');
-    if (imageGallery && house.images) {
+    if (imageGallery && house.images && house.images.length > 0) {
         const galleryImages = imageGallery.querySelector('.gallery-images');
         if (galleryImages) {
             galleryImages.innerHTML = '';
             house.images.forEach((imageUrl, index) => {
                 const img = document.createElement('img');
                 img.src = imageUrl;
-                img.alt = `${house.houseName} 이미지 ${index + 1}`;
+                img.alt = `${house.name || house.houseName || '모델하우스'} 이미지 ${index + 1}`;
                 img.className = 'gallery-image';
                 img.style.cursor = 'pointer';
                 
@@ -218,12 +291,18 @@ function showModelHouseInfo(house) {
                 galleryImages.appendChild(img);
             });
         }
+    } else if (imageGallery) {
+        // 이미지가 없는 경우 안내 메시지
+        const galleryImages = imageGallery.querySelector('.gallery-images');
+        if (galleryImages) {
+            galleryImages.innerHTML = '<p style="color: #7f8c8d; text-align: center;">등록된 이미지가 없습니다.</p>';
+        }
     }
-    
-    // 등록 기간 및 잔여일 정보는 표시하지 않음 (숨김 처리)
     
     // 패널 표시
     infoPanel.classList.add('show');
+    
+    console.log('모델하우스 정보 표시됨:', house);
 }
 
 // 검색 기능 구현
@@ -550,36 +629,36 @@ function copyAddress() {
 }
 
 // 페이지 로드 시 지도 초기화
-window.addEventListener('load', function() {
-    console.log('페이지 로드 완료');
-    console.log('kakao 객체 확인:', typeof kakao);
-    console.log('kakao.maps 확인:', typeof kakao !== 'undefined' ? typeof kakao.maps : 'undefined');
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('지도 페이지 로드됨');
     
-    // Kakao Maps API가 로드되었는지 확인
-    if (typeof kakao !== 'undefined' && kakao.maps) {
-        console.log('Kakao Maps API 로드됨, 지도 초기화 시작');
-        initMap();
-        initSearch();
-    } else {
-        console.log('Kakao Maps API 아직 로드되지 않음, 대기 시작');
-        // API가 아직 로드되지 않은 경우 대기
-        const checkKakao = setInterval(function() {
-            if (typeof kakao !== 'undefined' && kakao.maps) {
-                console.log('Kakao Maps API 로드 완료, 지도 초기화 시작');
-                clearInterval(checkKakao);
-                initMap();
-                initSearch();
-            }
-        }, 100);
-        
-        // 10초 후 타임아웃
-        setTimeout(() => {
-            if (checkKakao) {
-                clearInterval(checkKakao);
-                console.error('Kakao Maps API 로드 타임아웃');
-            }
-        }, 10000);
-    }
+    // 지도 초기화 시작
+    initMap();
+    
+    // 검색 기능 초기화
+    initSearch();
+    
+    // 윈도우 리사이즈 시 지도 크기 조정
+    window.addEventListener('resize', function() {
+        if (map) {
+            map.relayout();
+        }
+    });
+    
+    // 키보드 단축키
+    document.addEventListener('keydown', function(e) {
+        switch(e.key) {
+            case 'Escape':
+                closeInfo();
+                break;
+            case 'Home':
+                resetMap();
+                break;
+            case 'm':
+                showAllMarkers();
+                break;
+        }
+    });
 });
 
 // 검색 기능 초기화
@@ -630,25 +709,3 @@ function performSearchFromInput() {
         }, 2000);
     }
 }
-
-// 윈도우 리사이즈 시 지도 크기 조정
-window.addEventListener('resize', function() {
-    if (map) {
-        map.relayout();
-    }
-});
-
-// 키보드 단축키
-document.addEventListener('keydown', function(e) {
-    switch(e.key) {
-        case 'Escape':
-            closeInfo();
-            break;
-        case 'Home':
-            resetMap();
-            break;
-        case 'm':
-            showAllMarkers();
-            break;
-    }
-});
