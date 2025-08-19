@@ -42,7 +42,7 @@
             
             <!-- QR 코드 섹션 -->
             <div class="qr-section">
-                <img id="infoQrCode" src="https://via.placeholder.com/150x150/000000/ffffff?text=QR" alt="QR 코드" class="qr-code">
+                <img id="infoQrCode" src="https://placehold.co/150x150/000000/ffffff?text=QR" alt="QR 코드" class="qr-code">
             </div>
             
             <!-- 기본 정보 섹션 -->
@@ -88,16 +88,20 @@
             <div class="advertisement-section">
                 <h4>해당 광고:</h4>
                 <div class="ad-banners">
+                    <!-- 개발용: placehold.co 사용, 실제 서비스용: 로컬 이미지로 교체 권장 -->
                     <div class="ad-banner">
-                        <img src="https://via.placeholder.com/250x100/ff6b6b/ffffff?text=광고+배너+1" alt="광고 1">
+                        <!-- 실제 서비스용: <img src="/images/ad-banner-1.jpg" alt="광고 1"> -->
+                        <img src="https://placehold.co/250x100/ff6b6b/ffffff?text=광고+배너+1" alt="광고 1">
                         <p>KPOP DEMON HUNTERS GOLDEN OFFICIAL LYRIC VIDEO</p>
                     </div>
                     <div class="ad-banner">
-                        <img src="https://via.placeholder.com/250x100/4ecdc4/ffffff?text=광고+배너+2" alt="광고 2">
+                        <!-- 실제 서비스용: <img src="/images/ad-banner-2.jpg" alt="광고 2"> -->
+                        <img src="https://placehold.co/250x100/4ecdc4/ffffff?text=광고+배너+2" alt="광고 2">
                         <p>KPOP DEMON HUNTERS GOLDEN OFFICIAL LYRIC VIDEO</p>
                     </div>
                     <div class="ad-banner">
-                        <img src="https://via.placeholder.com/250x100/45b7d1/ffffff?text=광고+배너+3" alt="광고 3">
+                        <!-- 실제 서비스용: <img src="/images/ad-banner-3.jpg" alt="광고 3"> -->
+                        <img src="https://placehold.co/250x100/45b7d1/ffffff?text=광고+배너+3" alt="광고 3">
                         <p>KPOP DEMON HUNTERS GOLDEN OFFICIAL LYRIC VIDEO</p>
                     </div>
                 </div>
@@ -116,7 +120,44 @@
     </div>
 
     <!-- Kakao Maps API -->
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=91cb0bd7449dd781a29428e986969795"></script>
+    <script defer src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=91cb0bd7449dd781a29428e986969795&libraries=services"></script>
+    <script>
+        // 페이지 로드 완료 후 지도 초기화
+        window.addEventListener('load', function() {
+            console.log('페이지 로드 완료, 지도 초기화 시작');
+            
+            // Kakao Maps API가 로드되었는지 확인
+            if (typeof kakao !== 'undefined' && kakao.maps) {
+                console.log('Kakao Maps API 로드됨, 지도 초기화 시작');
+                if (typeof initMap === 'function') {
+                    initMap();
+                }
+            } else {
+                console.log('Kakao Maps API 로딩 대기 중...');
+                // API 로딩 대기
+                const checkKakao = setInterval(function() {
+                    if (typeof kakao !== 'undefined' && kakao.maps) {
+                        clearInterval(checkKakao);
+                        console.log('Kakao Maps API 로딩 완료, 지도 초기화 시작');
+                        if (typeof initMap === 'function') {
+                            initMap();
+                        }
+                    }
+                }, 100);
+                
+                // 10초 후 타임아웃
+                setTimeout(() => {
+                    if (checkKakao) {
+                        clearInterval(checkKakao);
+                        console.error('Kakao Maps API 로딩 타임아웃');
+                        if (typeof showMapError === 'function') {
+                            showMapError();
+                        }
+                    }
+                }, 10000);
+            }
+        });
+    </script>
     <script th:src="@{/js/map.js}"></script>
 </body>
 </html>

@@ -1,158 +1,105 @@
-// 로그인 상태 관리
-let isLoggedIn = false;
-let currentUser = null;
-let isAdmin = false;
-
-// 페이지 로드 시 로그인 상태 확인
+// Simple Model House Cards Display
 document.addEventListener('DOMContentLoaded', function() {
-    checkLoginStatus();
-});
-
-// 로그인 상태 확인
-function checkLoginStatus() {
-    // localStorage에서 로그인 상태 확인
-    const loginData = localStorage.getItem('loginData');
-    if (loginData) {
-        const userData = JSON.parse(loginData);
-        isLoggedIn = true;
-        currentUser = userData.email;
-        isAdmin = userData.role === 'ROLE_ADMIN';
-        updateAuthButtons();
-    } else {
-        isLoggedIn = false;
-        currentUser = null;
-        isAdmin = false;
-        updateAuthButtons();
-    }
-}
-
-// 인증 버튼 업데이트
-function updateAuthButtons() {
-    const loggedOutDiv = document.querySelector('.auth-buttons-logged-out');
-    const loggedInDiv = document.querySelector('.auth-buttons-logged-in');
-    const adminSection = document.querySelector('.admin-section');
-    const currentUserSpan = document.querySelector('.current-user');
+    const carouselTrack = document.querySelector('.carousel-track');
     
-    if (isLoggedIn) {
-        // 로그인된 상태
-        if (loggedOutDiv) loggedOutDiv.style.display = 'none';
-        if (loggedInDiv) loggedInDiv.style.display = 'flex';
-        if (currentUserSpan) currentUserSpan.textContent = currentUser;
+    if (carouselTrack) {
+        // 카드 클릭 이벤트 추가
+        const items = carouselTrack.querySelectorAll('.carousel-item');
         
-        // 관리자 권한 확인
-        if (adminSection) {
-            adminSection.style.display = isAdmin ? 'flex' : 'none';
-        }
-    } else {
-        // 로그인되지 않은 상태
-        if (loggedOutDiv) loggedOutDiv.style.display = 'flex';
-        if (loggedInDiv) loggedInDiv.style.display = 'none';
-    }
-}
-
-// 로그아웃 함수
-function logout() {
-    // localStorage에서 로그인 데이터 제거
-    localStorage.removeItem('loginData');
-    
-    // 로그인 상태 업데이트
-    isLoggedIn = false;
-    currentUser = null;
-    isAdmin = false;
-    
-    // 버튼 상태 업데이트
-    updateAuthButtons();
-    
-    // 메인 페이지로 리다이렉트
-    window.location.href = 'index.html';
-}
-
-// 로그인 성공 시 호출되는 함수
-function loginSuccess(userData) {
-    // localStorage에 로그인 데이터 저장
-    localStorage.setItem('loginData', JSON.stringify(userData));
-    
-    // 로그인 상태 업데이트
-    isLoggedIn = true;
-    currentUser = userData.email;
-    isAdmin = userData.role === 'ROLE_ADMIN';
-    
-    // 버튼 상태 업데이트
-    updateAuthButtons();
-}
-
-// 모델하우스 카드 클릭 이벤트 및 이미지 로드 관리
-document.addEventListener('DOMContentLoaded', function() {
-    const carouselItems = document.querySelectorAll('.carousel-item');
-    
-    carouselItems.forEach(item => {
-        // 이미지 로드 상태 확인 및 관리
-        const image = item.querySelector('.representative-image');
-        const noImageDiv = item.querySelector('.preview-image.no-image');
-        
-        if (image && noImageDiv) {
-            // 이미지 로드 성공 시
-            image.addEventListener('load', function() {
-                this.style.display = 'block';
-                if (noImageDiv) noImageDiv.style.display = 'none';
+        items.forEach((item, index) => {
+            item.addEventListener('click', function() {
+                const modelId = this.getAttribute('data-model-id');
+                const lat = this.getAttribute('data-lat');
+                const lng = this.getAttribute('data-lng');
+                
+                // 클릭 애니메이션
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 150);
+                
+                // 지도 페이지로 이동 (해당 마커로 최대 확대)
+                setTimeout(() => {
+                    navigateToMap(lat, lng, modelId);
+                }, 200);
             });
-            
-            // 이미지 로드 실패 시
-            image.addEventListener('error', function() {
-                this.style.display = 'none';
-                if (noImageDiv) noImageDiv.style.display = 'flex';
-            });
-            
-            // 초기 상태 설정
-            if (image.complete && image.naturalHeight !== 0) {
-                image.style.display = 'block';
-                if (noImageDiv) noImageDiv.style.display = 'none';
-            } else {
-                image.style.display = 'none';
-                if (noImageDiv) noImageDiv.style.display = 'flex';
-            }
-        }
+        });
         
-        // 클릭 이벤트
-        item.addEventListener('click', function() {
-            const modelId = this.getAttribute('data-model-id');
-            const lat = this.getAttribute('data-lat');
-            const lng = this.getAttribute('data-lng');
-            
-            // 모델하우스 상세 페이지로 이동 (향후 구현)
-            console.log('모델하우스 클릭:', { modelId, lat, lng });
-            
-            // 임시로 지도 페이지로 이동
-            if (lat && lng) {
-                window.location.href = `map.html?lat=${lat}&lng=${lng}`;
+        // Touch/swipe functionality
+        let startX = 0;
+        let currentX = 0;
+        
+        carouselTrack.addEventListener('touchstart', function(e) {
+            startX = e.touches[0].clientX;
+        });
+        
+        carouselTrack.addEventListener('touchmove', function(e) {
+            currentX = e.touches[0].clientX;
+        });
+        
+        carouselTrack.addEventListener('touchend', function() {
+            const diff = startX - currentX;
+            if (Math.abs(diff) > 50) {
+                if (diff > 0) {
+                    // Swipe left
+                    // 카드 이동 로직 제거
+                } else {
+                    // Swipe right
+                    // 카드 이동 로직 제거
+                }
             }
         });
-    });
-});
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft') {
+                // 카드 이동 로직 제거
+            } else if (e.key === 'ArrowRight') {
+                // 카드 이동 로직 제거
+            }
+        });
+    }
+    
+    // Navigation function
+    function navigateToMap(lat, lng, modelId) {
+        const mapUrl = `/map?lat=${lat}&lng=${lng}&modelId=${modelId}`;
+        window.location.href = mapUrl;
+    }
+    
 
-// 검색 기능
-document.addEventListener('DOMContentLoaded', function() {
+    
+    // Search functionality
     const searchInput = document.querySelector('.search-input');
     const searchBtn = document.querySelector('.search-btn');
     
-    if (searchBtn) {
+    if (searchInput && searchBtn) {
+        // Search button click event
         searchBtn.addEventListener('click', function() {
-            const searchTerm = searchInput ? searchInput.value.trim() : '';
-            if (searchTerm) {
-                // 검색 기능 구현 (향후)
-                console.log('검색어:', searchTerm);
-                alert(`"${searchTerm}" 검색 기능은 준비 중입니다.`);
-            }
+            performSearch();
         });
-    }
-    
-    // Enter 키로 검색
-    if (searchInput) {
+        
+        // Enter key press event
         searchInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
-                searchBtn.click();
+                performSearch();
             }
         });
+        
+        // Search function
+        function performSearch() {
+            const searchTerm = searchInput.value.trim();
+            if (searchTerm) {
+                // Add search animation
+                searchBtn.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    searchBtn.style.transform = 'scale(1)';
+                }, 150);
+                
+                // Navigate to map page with search term
+                const mapUrl = `/map?search=${encodeURIComponent(searchTerm)}`;
+                window.location.href = mapUrl;
+            }
+        }
     }
 });
 

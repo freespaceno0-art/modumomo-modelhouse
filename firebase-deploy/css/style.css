@@ -41,6 +41,7 @@ body {
     color: #00897b;
     background: rgba(38, 166, 154, 0.1);
     border-color: rgba(38, 166, 154, 0.3);
+    transform: translateY(-2px);
 }
 
 .top-auth-buttons .admin-link {
@@ -89,28 +90,6 @@ body {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-}
-
-/* 로그인 상태별 버튼 표시/숨김 */
-.auth-buttons-logged-out {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.auth-buttons-logged-in {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-/* 모델하우스 카드 스타일 */
-.preview-image.premium-office {
-    background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
-}
-
-.preview-image.startup-office {
-    background: linear-gradient(135deg, #607d8b 0%, #455a64 100%);
 }
 
 /* Hero Section */
@@ -203,6 +182,7 @@ body {
 }
 
 .search-btn:hover {
+    transform: scale(1.05);
     background: linear-gradient(135deg, #b2dfdb 0%, #80cbc4 50%, #4db6ac 100%);
     box-shadow: 0 4px 15px rgba(128, 203, 196, 0.6);
 }
@@ -230,7 +210,7 @@ body {
     position: absolute;
     bottom: -10px;
     left: 50%;
-    margin-left: -40px; /* transform 대신 margin 사용 */
+    transform: translateX(-50%);
     width: 80px;
     height: 4px;
     background: linear-gradient(135deg, #26a69a 0%, #4db6ac 50%, #80cbc4 100%);
@@ -269,16 +249,18 @@ body {
 }
 
 .carousel-item:hover {
-    transform: scale(1.02); /* 약간만 커지기 */
+    opacity: 1;
+    transform: scale(1.05);
 }
 
 .model-preview {
-    background: white;
-    border-radius: 8px;
-    padding: 0;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    border: 1px solid #e0e0e0;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 2.6rem;
+    box-shadow: 0 15px 35px rgba(76, 175, 80, 0.15);
+    transition: all 0.4s ease;
+    border: 2px solid transparent;
+    backdrop-filter: blur(10px);
     position: relative;
     overflow: hidden;
     height: 100%;
@@ -286,45 +268,49 @@ body {
     flex-direction: column;
 }
 
-/* ::before 가상 요소 제거 */
+.model-preview::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(135deg, #26a69a 0%, #4db6ac 50%, #80cbc4 100%);
+    transform: scaleX(0);
+    transition: transform 0.4s ease;
+}
 
 .model-preview:hover {
-    transform: scale(1.05); /* 단순히 커지기만 */
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15); /* 그림자 약간 강화 */
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 25px 50px rgba(76, 175, 80, 0.25);
+    border-color: rgba(38, 166, 154, 0.3);
+}
+
+.model-preview:hover::before {
+    transform: scaleX(1);
 }
 
 .preview-image-container {
     width: 100%;
-    height: 200px; /* 이미지 영역을 더 크게 */
-    margin: 0;
+    height: 160px;
+    margin-bottom: 1rem;
     position: relative;
     overflow: hidden;
-    border-radius: 0; /* 모서리 둥글게 하지 않음 */
-    border-bottom: 1px solid #e0e0e0; /* 하단 경계선 추가 */
+    border-radius: 15px;
 }
 
 .preview-image {
     width: 100%;
     height: 100%;
-    background: white;
-    border-radius: 0;
+    background: linear-gradient(135deg, #e8f5f5 0%, #c8e6c9 100%);
+    border-radius: 15px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: none;
+    border: 1px solid rgba(76, 175, 80, 0.1);
     position: relative;
     overflow: hidden;
     flex-direction: column;
-    box-sizing: border-box;
-}
-
-/* 이미지 플레이스홀더 텍스트 */
-.image-placeholder {
-    color: #333;
-    font-size: 1rem;
-    font-weight: 500;
-    text-align: center;
-    line-height: 1.2;
 }
 
 /* 이미지 로드 실패 시 기본 스타일 */
@@ -333,7 +319,6 @@ body {
     height: 100%;
     object-fit: cover;
     border-radius: 15px;
-    box-sizing: border-box;
 }
 
 .preview-image img:not([src]), 
@@ -362,8 +347,6 @@ body {
     object-fit: cover;
     border-radius: 15px;
     transition: all 0.3s ease;
-    box-sizing: border-box;
-    display: block; /* 기본적으로 표시 */
 }
 
 .preview-image i {
@@ -516,25 +499,23 @@ body {
 }
 
 .model-title {
-    font-size: 1rem;
-    font-weight: 500;
-    color: #333;
-    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 0.3rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    text-align: center;
+    direction: rtl;
+    text-align: left;
     width: 100%;
-    padding: 1rem 0.5rem;
-    box-sizing: border-box;
-    background: white;
 }
 
 /* Carousel Navigation Buttons */
 .carousel-btn {
     position: absolute;
     top: 50%;
-    margin-top: -25px; /* transform 대신 margin 사용 */
+    transform: translateY(-50%);
     background: rgba(255, 255, 255, 0.9);
     border: none;
     border-radius: 50%;
@@ -551,6 +532,7 @@ body {
 
 .carousel-btn:hover {
     background: rgba(255, 255, 255, 1);
+    transform: translateY(-50%) scale(1.1);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
@@ -649,24 +631,13 @@ body {
         gap: 5px;
     }
     
-    .model-preview {
-        padding: 0;
-    }
-    
-    .preview-image-container {
-        margin: 0;
-        height: 160px;
-    }
-    
     .preview-image {
         width: 100%;
-        height: 100%;
+        height: 140px;
     }
     
     .model-title {
-        font-size: 0.9rem;
-        margin: 0;
-        padding: 0.8rem 0.4rem;
+        font-size: 1.0rem;
     }
     
     .carousel-item {
@@ -725,25 +696,13 @@ body {
         gap: 5px;
     }
     
-    .preview-image-container {
-        width: 100%;
-        height: 120px;
-        margin: 0;
-    }
-    
-    .model-preview {
-        padding: 0;
-    }
-    
     .preview-image {
         width: 100%;
-        height: 100%;
+        height: 130px;
     }
     
     .model-title {
-        font-size: 0.8rem;
-        margin: 0;
-        padding: 0.6rem 0.3rem;
+        font-size: 0.9rem;
     }
     
     .carousel-item {

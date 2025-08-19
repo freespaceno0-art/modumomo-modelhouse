@@ -5,35 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>모두의 모델하우스 - 모모</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='bg' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' style='stop-color:%2326a69a;stop-opacity:1' /><stop offset='100%' style='stop-color:%2300897b;stop-opacity:1' /></linearGradient></defs><rect width='100' height='100' fill='url(%23bg)' rx='8'/><rect x='15' y='20' width='70' height='60' fill='%23ffffff' rx='4'/><rect x='25' y='30' width='20' height='15' fill='%2326a69a' rx='2'/><rect x='55' y='30' width='20' height='15' fill='%2326a69a' rx='2'/><rect x='25' y='55' width='20' height='15' fill='%2326a69a' rx='2'/><rect x='55' y='55' width='20' height='15' fill='%2326a69a' rx='2'/><text x='50' y='85' text-anchor='middle' font-family='Arial, sans-serif' font-size='16' font-weight='bold' fill='%23ffffff'>모모</text></svg>">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <!-- Top Right Auth Buttons -->
     <div class="top-auth-buttons">
-        <!-- 로그인하지 않은 경우 (기본 상태) -->
-        <div class="auth-buttons-logged-out">
-            <a href="login.html" class="auth-btn">로그인</a>
+        <!-- 로그인하지 않은 경우 -->
+        <div th:if="${!isLoggedIn}">
+            <a href="/login" class="auth-btn">로그인</a>
             <span class="separator">/</span>
-            <a href="signup.html" class="auth-btn">회원가입</a>
+            <a href="/signup" class="auth-btn">회원가입</a>
         </div>
         
-        <!-- 로그인한 경우 (JavaScript로 동적 표시) -->
-        <div class="auth-buttons-logged-in" style="display: none;">
+        <!-- 로그인한 경우 -->
+        <div th:if="${isLoggedIn}">
             <span class="user-info">
                 <i class="fas fa-user"></i>
-                <span class="current-user">사용자</span>
+                <span th:text="${currentUser}">사용자</span>
             </span>
             <span class="separator">|</span>
-            <a href="#" class="auth-btn logout-btn" onclick="logout()">
+            <a href="/logout" class="auth-btn logout-btn">
                 <i class="fas fa-sign-out-alt"></i> 로그아웃
             </a>
             
-            <!-- 관리자 버튼 (JavaScript로 동적 표시) -->
-            <div class="admin-section" style="display: none;">
+            <!-- 관리자인 경우에만 관리자 버튼 표시 -->
+            <div th:if="${isAdmin}" class="admin-section">
                 <span class="separator">|</span>
-                <a href="admin.html" class="auth-btn admin-link">
+                <a href="/admin" class="auth-btn admin-link">
                     <i class="fas fa-user-shield"></i> 관리자
                 </a>
             </div>
@@ -68,37 +68,38 @@
             </div>
             <div class="carousel-container">
                 <div class="carousel-track">
-                    <!-- 새로운 모델하우스 카드들 -->
-                    <div class="carousel-item" data-model-id="1" data-lat="37.5447" data-lng="127.0559">
+                    <!-- 동적으로 모델하우스 카드 생성 -->
+                    <div th:each="house : ${recentModelHouses}" 
+                         th:class="'carousel-item'" 
+                         th:attr="data-model-id=${house.id}, data-lat=${house.latitude}, data-lng=${house.longitude}">
                         <div class="model-preview">
                             <div class="preview-image-container">
-                                <div class="preview-image">
-                                    <span class="image-placeholder">이미지</span>
+                                <img th:if="${house.representativeImage != null and house.representativeImage != ''}" 
+                                     th:src="${house.representativeImage}" 
+                                     th:alt="${house.houseName}" 
+                                     class="representative-image">
+                                <div th:if="${house.representativeImage == null or house.representativeImage == ''}" 
+                                     class="preview-image" th:class="'preview-image ' + ${#strings.toLowerCase(house.houseCategory)}">
+                                    <i class="fas fa-home"></i>
+                                    <div class="house-type" th:text="${house.houseCategory}">카테고리</div>
                                 </div>
                             </div>
-                            <h3 class="model-title">강남 더 힐스테이트</h3>
+                            <h3 class="model-title" th:text="${house.houseName}">모델하우스 이름</h3>
                         </div>
                     </div>
                     
-                    <div class="carousel-item" data-model-id="2" data-lat="37.5248" data-lng="127.0400">
+                    <!-- 모델하우스가 없을 경우 기본 카드 표시 -->
+                    <div th:if="${#lists.isEmpty(recentModelHouses)}" class="carousel-item">
                         <div class="model-preview">
-                            <div class="preview-image-container">
-                                <div class="preview-image">
-                                    <span class="image-placeholder">이미지</span>
-                                </div>
+                            <div class="preview-image modern-house">
+                                <i class="fas fa-home"></i>
+                                <div class="house-type">모던</div>
                             </div>
-                            <h3 class="model-title">서울숲 모던하우스</h3>
-                        </div>
-                    </div>
-                    
-                    <div class="carousel-item" data-model-id="3" data-lat="37.5563" data-lng="126.9236">
-                        <div class="model-preview">
-                            <div class="preview-image-container">
-                                <div class="preview-image">
-                                    <span class="image-placeholder">이미지</span>
-                                </div>
+                            <h3 class="model-title">등록된 모델하우스가 없습니다</h3>
+                            <div class="house-info">
+                                <span class="info-item"><i class="fas fa-info-circle"></i> 관리자 페이지에서 등록해주세요</span>
                             </div>
-                            <h3 class="model-title">홍대 창업 오피스</h3>
+                            <p class="house-description">새로운 모델하우스를 등록하면 여기에 표시됩니다</p>
                         </div>
                     </div>
                 </div>
@@ -106,6 +107,6 @@
         </section>
     </main>
 
-    <script src="js/script.js"></script>
+    <script th:src="@{/js/script.js}"></script>
 </body>
 </html>
