@@ -66,6 +66,12 @@ async function initMap() {
         map = new kakao.maps.Map(container, options);
         console.log('지도 생성 성공:', map);
         
+        // 지도 로딩 완료 표시
+        const mapContainer = document.querySelector('.map-container');
+        if (mapContainer) {
+            mapContainer.classList.add('loaded');
+        }
+        
         // 전역 변수로 map 저장
         window.kakaoMap = map;
         
@@ -169,6 +175,12 @@ function waitForKakaoMaps() {
 // 지도 로드 오류 시 표시할 메시지
 function showMapError() {
     const container = document.getElementById('map');
+    const mapContainer = document.querySelector('.map-container');
+    
+    if (mapContainer) {
+        mapContainer.classList.add('loaded'); // 로딩 표시 제거
+    }
+    
     if (container) {
         container.innerHTML = `
             <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background: #f8f9fa; color: #6c757d; padding: 2rem; text-align: center;">
