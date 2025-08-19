@@ -116,13 +116,25 @@
     </div>
 
     <!-- Kakao Maps API -->
+    <link rel="preload" href="//dapi.kakao.com/v2/maps/sdk.js?appkey=91cb0bd7449dd781a29428e986969795&libraries=services" as="script" crossorigin="anonymous">
     <script>
         // Kakao Maps API를 더 안전하게 로드
         (function() {
+            // 이미 로드된 경우 중복 로드 방지
+            if (window.kakao && window.kakao.maps) {
+                console.log('Kakao Maps API가 이미 로드됨');
+                if (typeof initMap === 'function') {
+                    initMap();
+                }
+                return;
+            }
+            
             const script = document.createElement('script');
             script.async = true;
             script.defer = true;
+            script.crossOrigin = 'anonymous';
             script.src = '//dapi.kakao.com/v2/maps/sdk.js?appkey=91cb0bd7449dd781a29428e986969795&libraries=services';
+            
             script.onload = function() {
                 console.log('Kakao Maps API 로드 완료');
                 // API 로드 완료 후 지도 초기화
@@ -130,10 +142,15 @@
                     initMap();
                 }
             };
+            
             script.onerror = function() {
                 console.error('Kakao Maps API 로드 실패');
-                showMapError();
+                if (typeof showMapError === 'function') {
+                    showMapError();
+                }
             };
+            
+            // 스크립트를 head에 추가
             document.head.appendChild(script);
         })();
     </script>

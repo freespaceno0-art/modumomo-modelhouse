@@ -129,22 +129,40 @@ async function initMap() {
 // Kakao Maps API 로딩 대기
 function waitForKakaoMaps() {
     return new Promise((resolve, reject) => {
+        // 이미 로드된 경우 즉시 resolve
+        if (typeof kakao !== 'undefined' && kakao.maps) {
+            console.log('✅ Kakao Maps API 이미 로드됨');
+            resolve();
+            return;
+        }
+        
         const checkKakao = () => {
             if (typeof kakao !== 'undefined' && kakao.maps) {
                 console.log('✅ Kakao Maps API 로딩 완료');
                 resolve();
             } else {
                 console.log('⏳ Kakao Maps API 로딩 대기 중...');
-                setTimeout(checkKakao, 100);
+                setTimeout(checkKakao, 200); // 200ms마다 체크 (빈도 감소)
             }
         };
         
         // 30초 타임아웃
-        setTimeout(() => {
+        const timeout = setTimeout(() => {
             reject(new Error('Kakao Maps API 로딩 타임아웃'));
         }, 30000);
         
-        checkKakao();
+        // 타임아웃 정리
+        const checkKakaoWithTimeout = () => {
+            if (typeof kakao !== 'undefined' && kakao.maps) {
+                clearTimeout(timeout);
+                console.log('✅ Kakao Maps API 로딩 완료');
+                resolve();
+            } else {
+                setTimeout(checkKakaoWithTimeout, 200);
+            }
+        };
+        
+        checkKakaoWithTimeout();
     });
 }
 
@@ -153,11 +171,22 @@ function showMapError() {
     const container = document.getElementById('map');
     if (container) {
         container.innerHTML = `
-            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background: #f8f9fa; color: #6c757d;">
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background: #f8f9fa; color: #6c757d; padding: 2rem; text-align: center;">
                 <i class="fas fa-map-marked-alt" style="font-size: 3rem; margin-bottom: 1rem; color: #26a69a;"></i>
                 <h3>지도를 불러올 수 없습니다</h3>
-                <p>Kakao Maps API 키가 유효하지 않거나 네트워크 문제가 발생했습니다.</p>
-                <p>관리자에게 문의하세요.</p>
+                <p>Kakao Maps API 로딩에 실패했습니다.</p>
+                <p style="margin-top: 1rem; font-size: 0.9rem; color: #868e96;">
+                    <strong>가능한 원인:</strong><br>
+                    • 네트워크 연결 문제<br>
+                    • 브라우저 보안 설정<br>
+                    • API 키 문제
+                </p>
+                <button onclick="location.reload()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: #26a69a; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                    <i class="fas fa-redo"></i> 페이지 새로고침
+                </button>
+                <p style="margin-top: 1rem; font-size: 0.8rem; color: #adb5bd;">
+                    문제가 지속되면 관리자에게 문의하세요.
+                </p>
             </div>
         `;
     }
