@@ -35,13 +35,13 @@ firebase login
 #### 1단계: GitHub Secrets 설정
 GitHub 저장소 → Settings → Secrets and variables → Actions에서 다음 시크릿 추가:
 
-- `FIREBASE_SERVICE_ACCOUNT_MODUMOMO`: Firebase 서비스 계정 JSON 키
+- `FIREBASE_SERVICE_ACCOUNT_SWIFT_CURSOR_467917_V4`: Firebase 서비스 계정 JSON 키
 - `GITHUB_TOKEN`: 자동으로 설정됨
 
 #### 2단계: Firebase 서비스 계정 키 생성
 1. Firebase Console → 프로젝트 설정 → 서비스 계정
 2. "새 비공개 키 생성" 클릭
-3. 다운로드된 JSON 파일 내용을 `FIREBASE_SERVICE_ACCOUNT_MODUMOMO` 시크릿에 복사
+3. 다운로드된 JSON 파일 내용을 `FIREBASE_SERVICE_ACCOUNT_SWIFT_CURSOR_467917_V4` 시크릿에 복사
 
 #### 3단계: 자동 배포
 - `main` 또는 `master` 브랜치에 푸시하면 자동으로 배포됩니다
