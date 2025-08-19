@@ -40,94 +40,72 @@ async function loadModelHouses() {
     }
 }
 
-// 지도 초기화
+// 지도 초기화 함수
 async function initMap() {
-    console.log('initMap 함수 호출됨');
-    
-    const container = document.getElementById('map');
-    if (!container) {
-        console.error('map 컨테이너를 찾을 수 없습니다');
-        return;
-    }
-    
-    console.log('map 컨테이너 찾음:', container);
-    
-    // Kakao Maps API가 로드되었는지 확인하고 대기
-    await waitForKakaoMaps();
-    
-    const options = {
-        center: new kakao.maps.LatLng(37.5665, 126.9780), // 서울시청
-        level: 8
-    };
-    
-    console.log('지도 옵션:', options);
+    console.log('=== 지도 초기화 시작 ===');
     
     try {
-        map = new kakao.maps.Map(container, options);
-        console.log('지도 생성 성공:', map);
-        
-        // 지도 로딩 완료 표시
-        const mapContainer = document.querySelector('.map-container');
-        if (mapContainer) {
-            mapContainer.classList.add('loaded');
+        // 지도 컨테이너 확인
+        const mapContainer = document.getElementById('map');
+        if (!mapContainer) {
+            console.error('지도 컨테이너를 찾을 수 없습니다!');
+            return;
         }
         
-        // 전역 변수로 map 저장
-        window.kakaoMap = map;
+        console.log('지도 컨테이너 찾음:', mapContainer);
         
-        // 모델하우스 데이터 로드 후 마커 추가
-        await loadModelHouses();
+        // Kakao Maps API 확인
+        if (typeof kakao === 'undefined' || !kakao.maps) {
+            console.error('Kakao Maps API가 로드되지 않았습니다!');
+            return;
+        }
         
-        // 지도 클릭 이벤트
-        kakao.maps.event.addListener(map, 'click', function() {
-            closeInfo();
+        console.log('Kakao Maps API 확인됨');
+        
+        // URL 파라미터에서 좌표 가져오기
+        const urlParams = new URLSearchParams(window.location.search);
+        const lat = parseFloat(urlParams.get('lat')) || 37.5665;
+        const lng = parseFloat(urlParams.get('lng')) || 126.9780;
+        
+        console.log('지도 좌표:', lat, lng);
+        
+        // 지도 생성
+        const mapOptions = {
+            center: new kakao.maps.LatLng(lat, lng),
+            level: 8
+        };
+        
+        console.log('지도 옵션 설정:', mapOptions);
+        
+        // 지도 인스턴스 생성
+        map = new kakao.maps.Map(mapContainer, mapOptions);
+        
+        if (!map) {
+            console.error('지도 인스턴스 생성 실패!');
+            return;
+        }
+        
+        console.log('지도 인스턴스 생성 성공:', map);
+        
+        // 지도 로딩 완료 이벤트
+        kakao.maps.event.addListener(map, 'tilesloaded', function() {
+            console.log('지도 타일 로딩 완료');
+            mapContainer.classList.add('loaded');
         });
         
-        // URL 파라미터 확인
-        const urlParams = new URLSearchParams(window.location.search);
-        const modelId = urlParams.get('modelId');
-        const lat = urlParams.get('lat');
-        const lng = urlParams.get('lng');
-        const searchTerm = urlParams.get('search');
-        const houseName = urlParams.get('houseName');
+        // 지도 로딩 실패 이벤트
+        kakao.maps.event.addListener(map, 'error', function(error) {
+            console.error('지도 로딩 오류:', error);
+        });
         
-        console.log('URL 파라미터:', { modelId, lat, lng, searchTerm, houseName });
+        // 모델하우스 데이터 로드 및 마커 표시
+        await loadModelHouses();
+        addModelHouseMarkers();
         
-        if (searchTerm) {
-            // 검색어가 있는 경우 검색 결과 표시
-            performSearch(searchTerm, map);
-        } else if (lat && lng && modelId) {
-            // 메인 페이지에서 카드 클릭으로 넘어온 경우
-            const position = new kakao.maps.LatLng(parseFloat(lat), parseFloat(lng));
-            map.setCenter(position);
-            map.setLevel(1); // 최대 확대
-            
-            // 해당 모델하우스 정보 표시
-            const modelHouse = modelHouses.find(house => house.id == modelId);
-            if (modelHouse) {
-                // 지도가 이동한 후 정보 패널 표시
-                setTimeout(() => {
-                    showModelHouseInfo(modelHouse);
-                }, 500);
-            } else if (houseName) {
-                // 데이터베이스에 없는 경우 URL 파라미터로 전달된 정보로 표시
-                const tempHouse = {
-                    id: modelId,
-                    name: houseName,
-                    type: '등록된 모델하우스',
-                    address: '주소 정보 없음',
-                    phone: '연락처 정보 없음',
-                    price: '가격 정보 없음',
-                    description: '관리자 페이지에서 등록된 모델하우스입니다.'
-                };
-                setTimeout(() => {
-                    showModelHouseInfo(tempHouse);
-                }, 500);
-            }
-        }
+        console.log('=== 지도 초기화 완료 ===');
         
     } catch (error) {
-        console.error('지도 생성 실패:', error);
+        console.error('지도 초기화 중 오류 발생:', error);
         showMapError();
     }
 }
@@ -172,36 +150,43 @@ function waitForKakaoMaps() {
     });
 }
 
-// 지도 로드 오류 시 표시할 메시지
+// 지도 오류 표시
 function showMapError() {
-    const container = document.getElementById('map');
-    const mapContainer = document.querySelector('.map-container');
+    console.error('지도 로딩 실패 - 오류 표시 시작');
     
-    if (mapContainer) {
-        mapContainer.classList.add('loaded'); // 로딩 표시 제거
+    const mapContainer = document.getElementById('map');
+    if (!mapContainer) {
+        console.error('지도 컨테이너를 찾을 수 없어 오류를 표시할 수 없습니다');
+        return;
     }
     
-    if (container) {
-        container.innerHTML = `
-            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background: #f8f9fa; color: #6c757d; padding: 2rem; text-align: center;">
-                <i class="fas fa-map-marked-alt" style="font-size: 3rem; margin-bottom: 1rem; color: #26a69a;"></i>
-                <h3>지도를 불러올 수 없습니다</h3>
-                <p>Kakao Maps API 로딩에 실패했습니다.</p>
-                <p style="margin-top: 1rem; font-size: 0.9rem; color: #868e96;">
-                    <strong>가능한 원인:</strong><br>
-                    • 네트워크 연결 문제<br>
-                    • 브라우저 보안 설정<br>
-                    • API 키 문제
-                </p>
-                <button onclick="location.reload()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: #26a69a; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                    <i class="fas fa-redo"></i> 페이지 새로고침
+    // 로딩 스피너 제거
+    mapContainer.classList.add('loaded');
+    
+    // 오류 메시지 표시
+    mapContainer.innerHTML = `
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background: #f8f9fa; color: #6c757d; text-align: center; padding: 20px;">
+            <div style="font-size: 48px; margin-bottom: 20px;">🗺️</div>
+            <h3 style="margin-bottom: 15px; color: #495057;">지도를 불러올 수 없습니다</h3>
+            <p style="margin-bottom: 20px; line-height: 1.6;">
+                Kakao Maps API 로딩에 실패했습니다.<br>
+                잠시 후 다시 시도해주세요.
+            </p>
+            <div style="margin-bottom: 20px;">
+                <button onclick="location.reload()" style="background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-right: 10px;">
+                    🔄 페이지 새로고침
                 </button>
-                <p style="margin-top: 1rem; font-size: 0.8rem; color: #adb5bd;">
-                    문제가 지속되면 관리자에게 문의하세요.
-                </p>
+                <button onclick="initMap()" style="background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                    🗺️ 지도 다시 시도
+                </button>
             </div>
-        `;
-    }
+            <div style="font-size: 12px; color: #adb5bd; margin-top: 20px;">
+                문제가 지속되면 관리자에게 문의해주세요.
+            </div>
+        </div>
+    `;
+    
+    console.log('지도 오류 표시 완료');
 }
 
 // 모델하우스 마커 추가
