@@ -466,7 +466,7 @@ function closeSearchResults() {
             
             <!-- QR 코드 섹션 -->
             <div class="qr-section">
-                <img id="infoQrCode" src="https://via.placeholder.com/150x150/000000/ffffff?text=QR" alt="QR 코드" class="qr-code">
+                <img id="infoQrCode" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgdmlld0JveD0iMCAwIDE1MCAxNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiBmaWxsPSIjMDAwMDAwIi8+Cjx0ZXh0IHg9Ijc1IiB5PSI4MCIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmaWxsPSIjRkZGRkZGIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+UVIgQ29kZTwvdGV4dD4KPC9zdmc+" alt="QR 코드" class="qr-code">
             </div>
             
             <!-- 기본 정보 섹션 -->
@@ -522,15 +522,15 @@ function closeSearchResults() {
                 <h4>해당 광고:</h4>
                 <div class="ad-banners">
                     <div class="ad-banner">
-                        <img src="https://via.placeholder.com/250x100/ff6b6b/ffffff?text=광고+배너+1" alt="광고 1">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDI1MCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyNTAiIGhlaWdodD0iMTAwIiBmaWxsPSIjZmY2YjZiIi8+Cjx0ZXh0IHg9IjEyNSIgeT0iNjAiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iI0ZGRkZGRiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkFkIEJhbm5lciAxPC90ZXh0Pgo8L3N2Zz4=" alt="광고 1">
                         <p>KPOP DEMON HUNTERS GOLDEN OFFICIAL LYRIC VIDEO</p>
                     </div>
                     <div class="ad-banner">
-                        <img src="https://via.placeholder.com/250x100/4ecdc4/ffffff?text=광고+배너+2" alt="광고 2">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDI1MCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyNTAiIGhlaWdodD0iMTAwIiBmaWxsPSIjNGVjZGM0Ii8+Cjx0ZXh0IHg9IjEyNSIgeT0iNjAiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iI0ZGRkZGRiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkFkIEJhbm5lciAyPC90ZXh0Pgo8L3N2Zz4=" alt="광고 2">
                         <p>KPOP DEMON HUNTERS GOLDEN OFFICIAL LYRIC VIDEO</p>
                     </div>
                     <div class="ad-banner">
-                        <img src="https://via.placeholder.com/250x100/45b7d1/ffffff?text=광고+배너+3" alt="광고 3">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDI1MCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyNTAiIGhlaWdodD0iMTAwIiBmaWxsPSIjNDViN2QxIi8+Cjx0ZXh0IHg9IjEyNSIgeT0iNjAiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iI0ZGRkZGRiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkFkIEJhbm5lciAzPC90ZXh0Pgo8L3N2Zz4=" alt="광고 3">
                         <p>KPOP DEMON HUNTERS GOLDEN OFFICIAL LYRIC VIDEO</p>
                     </div>
                 </div>
