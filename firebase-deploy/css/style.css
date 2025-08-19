@@ -313,9 +313,9 @@ body {
 }
 
 .preview-image-container {
-    width: calc(100% - 4px); /* 좌우 2px씩 간격 */
-    height: 157px; /* 위쪽 3px 간격을 위해 높이 조정 */
-    margin: 3px 2px 1rem 2px; /* 위쪽 3px, 좌우 2px, 아래쪽 1rem */
+    width: 100%; /* 카드와 정확히 맞춤 */
+    height: 160px; /* 원래 높이로 복원 */
+    margin: 0 0 1rem 0; /* 여백 제거, 하단만 1rem */
     position: relative;
     overflow: hidden;
     border-radius: 15px;
@@ -334,6 +334,20 @@ body {
     overflow: hidden;
     flex-direction: column;
     box-sizing: border-box;
+}
+
+/* 이미지가 없을 경우 표시할 스타일 */
+.preview-image.no-image {
+    background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+    border: 1px solid rgba(158, 158, 158, 0.2);
+}
+
+.no-image-text {
+    color: #757575;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: center;
+    line-height: 1.2;
 }
 
 /* 이미지 로드 실패 시 기본 스타일 */
@@ -372,6 +386,7 @@ body {
     border-radius: 15px;
     transition: all 0.3s ease;
     box-sizing: border-box;
+    display: block; /* 기본적으로 표시 */
 }
 
 .preview-image i {
@@ -722,9 +737,9 @@ body {
     }
     
     .preview-image-container {
-        width: calc(100% - 4px); /* 좌우 2px씩 간격 */
-        height: 124px; /* 위쪽 3px 간격을 위해 높이 조정 */
-        margin: 3px 2px 1rem 2px; /* 위쪽 3px, 좌우 2px, 아래쪽 1rem */
+        width: 100%; /* 카드와 정확히 맞춤 */
+        height: 127px; /* 원래 높이로 복원 */
+        margin: 0 0 1rem 0; /* 여백 제거, 하단만 1rem */
     }
     
     .preview-image {

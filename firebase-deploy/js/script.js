@@ -81,11 +81,39 @@ function loginSuccess(userData) {
     updateAuthButtons();
 }
 
-// 모델하우스 카드 클릭 이벤트
+// 모델하우스 카드 클릭 이벤트 및 이미지 로드 관리
 document.addEventListener('DOMContentLoaded', function() {
     const carouselItems = document.querySelectorAll('.carousel-item');
     
     carouselItems.forEach(item => {
+        // 이미지 로드 상태 확인 및 관리
+        const image = item.querySelector('.representative-image');
+        const noImageDiv = item.querySelector('.preview-image.no-image');
+        
+        if (image && noImageDiv) {
+            // 이미지 로드 성공 시
+            image.addEventListener('load', function() {
+                this.style.display = 'block';
+                if (noImageDiv) noImageDiv.style.display = 'none';
+            });
+            
+            // 이미지 로드 실패 시
+            image.addEventListener('error', function() {
+                this.style.display = 'none';
+                if (noImageDiv) noImageDiv.style.display = 'flex';
+            });
+            
+            // 초기 상태 설정
+            if (image.complete && image.naturalHeight !== 0) {
+                image.style.display = 'block';
+                if (noImageDiv) noImageDiv.style.display = 'none';
+            } else {
+                image.style.display = 'none';
+                if (noImageDiv) noImageDiv.style.display = 'flex';
+            }
+        }
+        
+        // 클릭 이벤트
         item.addEventListener('click', function() {
             const modelId = this.getAttribute('data-model-id');
             const lat = this.getAttribute('data-lat');
