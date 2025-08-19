@@ -533,15 +533,19 @@ function closeSearchResults() {
             <div class="advertisement-section">
                 <h4>해당 광고:</h4>
                 <div class="ad-banners">
+                    <!-- 개발용: placehold.co 사용, 실제 서비스용: 로컬 이미지로 교체 권장 -->
                     <div class="ad-banner">
+                        <!-- 실제 서비스용: <img src="/images/ad-banner-1.jpg" alt="광고 1"> -->
                         <img src="https://placehold.co/250x100/ff6b6b/ffffff?text=광고+배너+1" alt="광고 1">
                         <p>KPOP DEMON HUNTERS GOLDEN OFFICIAL LYRIC VIDEO</p>
                     </div>
                     <div class="ad-banner">
+                        <!-- 실제 서비스용: <img src="/images/ad-banner-2.jpg" alt="광고 2"> -->
                         <img src="https://placehold.co/250x100/4ecdc4/ffffff?text=광고+배너+2" alt="광고 2">
                         <p>KPOP DEMON HUNTERS GOLDEN OFFICIAL LYRIC VIDEO</p>
                     </div>
                     <div class="ad-banner">
+                        <!-- 실제 서비스용: <img src="/images/ad-banner-3.jpg" alt="광고 3"> -->
                         <img src="https://placehold.co/250x100/45b7d1/ffffff?text=광고+배너+3" alt="광고 3">
                         <p>KPOP DEMON HUNTERS GOLDEN OFFICIAL LYRIC VIDEO</p>
                     </div>
@@ -698,8 +702,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // 지도 초기화는 HTML에서 처리됨 (window.load 이벤트)
-    console.log('지도 초기화는 페이지 로드 완료 후 HTML에서 처리됩니다.');
+    // 지도 초기화 보장 (DOM 로드 완료 시)
+    if (typeof kakao !== 'undefined' && kakao.maps) {
+        console.log('DOM 로드 시 Kakao Maps API가 이미 준비됨, 지도 초기화 시작');
+        initMap();
+    } else {
+        console.log('DOM 로드 시 Kakao Maps API 대기 중...');
+        // API 로딩 완료를 기다림 (HTML의 window.load 이벤트에서 처리됨)
+    }
 });
 
 // 검색 기능 초기화
