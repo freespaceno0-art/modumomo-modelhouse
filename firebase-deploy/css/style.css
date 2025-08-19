@@ -313,9 +313,9 @@ body {
 }
 
 .preview-image-container {
-    width: 100%;
-    height: 160px;
-    margin-bottom: 1rem;
+    width: calc(100% - 4px); /* 좌우 2px씩 간격 */
+    height: 157px; /* 위쪽 3px 간격을 위해 높이 조정 */
+    margin: 3px 2px 1rem 2px; /* 위쪽 3px, 좌우 2px, 아래쪽 1rem */
     position: relative;
     overflow: hidden;
     border-radius: 15px;
@@ -333,6 +333,7 @@ body {
     position: relative;
     overflow: hidden;
     flex-direction: column;
+    box-sizing: border-box;
 }
 
 /* 이미지 로드 실패 시 기본 스타일 */
@@ -341,6 +342,7 @@ body {
     height: 100%;
     object-fit: cover;
     border-radius: 15px;
+    box-sizing: border-box;
 }
 
 .preview-image img:not([src]), 
@@ -369,6 +371,7 @@ body {
     object-fit: cover;
     border-radius: 15px;
     transition: all 0.3s ease;
+    box-sizing: border-box;
 }
 
 .preview-image i {
@@ -718,9 +721,15 @@ body {
         gap: 5px;
     }
     
+    .preview-image-container {
+        width: calc(100% - 4px); /* 좌우 2px씩 간격 */
+        height: 124px; /* 위쪽 3px 간격을 위해 높이 조정 */
+        margin: 3px 2px 1rem 2px; /* 위쪽 3px, 좌우 2px, 아래쪽 1rem */
+    }
+    
     .preview-image {
         width: 100%;
-        height: 130px;
+        height: 100%;
     }
     
     .model-title {
