@@ -278,7 +278,7 @@ body {
 .model-preview {
     background: rgba(255, 255, 255, 0.95);
     border-radius: 20px;
-    padding: 2.6rem;
+    padding: 1.5rem; /* 패딩을 2.6rem에서 1.5rem으로 줄임 */
     box-shadow: 0 15px 35px rgba(76, 175, 80, 0.15);
     transition: all 0.4s ease;
     border: 2px solid transparent;
@@ -315,7 +315,7 @@ body {
 .preview-image-container {
     width: 100%; /* 카드와 정확히 맞춤 */
     height: 160px; /* 원래 높이로 복원 */
-    margin: 0 0 1rem 0; /* 여백 제거, 하단만 1rem */
+    margin: 0 0 0.5rem 0; /* 하단 여백을 0.5rem으로 줄임 */
     position: relative;
     overflow: hidden;
     border-radius: 15px;
@@ -546,9 +546,10 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    direction: rtl;
     text-align: left;
     width: 100%;
+    padding: 0 0.5rem; /* 좌우 여백 추가 */
+    box-sizing: border-box;
 }
 
 /* Carousel Navigation Buttons */
@@ -671,6 +672,10 @@ body {
         gap: 5px;
     }
     
+    .model-preview {
+        padding: 1rem; /* 패딩을 더 줄임 */
+    }
+    
     .preview-image {
         width: 100%;
         height: 140px;
@@ -678,6 +683,7 @@ body {
     
     .model-title {
         font-size: 1.0rem;
+        padding: 0 0.3rem; /* 좌우 여백 줄임 */
     }
     
     .carousel-item {
@@ -739,7 +745,11 @@ body {
     .preview-image-container {
         width: 100%; /* 카드와 정확히 맞춤 */
         height: 127px; /* 원래 높이로 복원 */
-        margin: 0 0 1rem 0; /* 여백 제거, 하단만 1rem */
+        margin: 0 0 0.5rem 0; /* 하단 여백을 0.5rem으로 줄임 */
+    }
+    
+    .model-preview {
+        padding: 0.8rem; /* 패딩을 더 줄임 */
     }
     
     .preview-image {
@@ -749,6 +759,7 @@ body {
     
     .model-title {
         font-size: 0.9rem;
+        padding: 0 0.2rem; /* 좌우 여백 줄임 */
     }
     
     .carousel-item {
