@@ -336,8 +336,7 @@ function addLink() {
     newLink.className = 'link-inputs';
     newLink.innerHTML = `
         <div class="link-item">
-            <input type="text" class="form-input" placeholder="링크 제목" name="linkTitle[]">
-            <input type="url" class="form-input" placeholder="URL" name="linkUrl[]">
+            <input type="url" class="form-input" placeholder="URL을 입력하세요" name="linkUrl[]" required>
             <button type="button" class="link-remove" onclick="removeLink(this)">×</button>
         </div>
     `;
@@ -414,14 +413,12 @@ function saveHouse() {
     }
     
     // 링크 정보
-    const linkTitles = document.querySelectorAll('input[name="linkTitle[]"]');
     const linkUrls = document.querySelectorAll('input[name="linkUrl[]"]');
     const links = [];
     
-    for (let i = 0; i < linkTitles.length; i++) {
-        if (linkTitles[i].value && linkUrls[i].value) {
+    for (let i = 0; i < linkUrls.length; i++) {
+        if (linkUrls[i].value) {
             links.push({
-                title: linkTitles[i].value,
                 url: linkUrls[i].value
             });
         }
@@ -502,8 +499,7 @@ function resetForm() {
     linkContainer.innerHTML = `
         <div class="link-inputs">
             <div class="link-item">
-                <input type="text" class="form-input" placeholder="링크 제목" name="linkTitle[]">
-                <input type="url" class="form-input" placeholder="URL" name="linkUrl[]">
+                <input type="url" class="form-input" placeholder="URL을 입력하세요" name="linkUrl[]" required>
                 <button type="button" class="link-remove" onclick="removeLink(this)">×</button>
             </div>
         </div>

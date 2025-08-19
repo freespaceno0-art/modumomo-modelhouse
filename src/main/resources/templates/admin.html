@@ -248,9 +248,7 @@
         }
 
         .link-inputs {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
+            display: block;
             margin-bottom: 1rem;
         }
 
@@ -751,8 +749,7 @@
                         <div id="linkContainer">
                             <div class="link-inputs">
                                 <div class="link-item">
-                                    <input type="text" class="form-input" placeholder="링크 제목" name="linkTitle[]">
-                                    <input type="url" class="form-input" placeholder="URL" name="linkUrl[]">
+                                    <input type="url" class="form-input" placeholder="URL을 입력하세요" name="linkUrl[]" required>
                                     <button type="button" class="link-remove" onclick="removeLink(this)">×</button>
                                 </div>
                             </div>

@@ -6,8 +6,11 @@ on:
   pull_request:
     branches: [ main, master ]
 
+env:
+  FIREBASE_PROJECT_ID: swift-cursor-467917-v4
+
 jobs:
-  build_and_deploy:
+  buildAndDeploy:
     runs-on: ubuntu-latest
     
     steps:
@@ -42,9 +45,8 @@ jobs:
         cp target/*.jar firebase-deploy/
         
     - name: Deploy to Firebase
-      uses: FirebaseExtended/action-hosting-deploy@v0
-      with:
-        repoToken: '${{ secrets.GITHUB_TOKEN }}'
-        firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_SWIFT_CURSOR_467917_V4 }}'
-        channelId: live
-        projectId: swift-cursor-467917-v4
+      run: |
+        cd firebase-deploy
+        firebase deploy --only hosting --project ${{ env.FIREBASE_PROJECT_ID }} --token "${{ secrets.FIREBASE_TOKEN }}"
+      env:
+        FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
