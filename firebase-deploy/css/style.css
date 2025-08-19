@@ -92,6 +92,28 @@ body {
     gap: 0.5rem;
 }
 
+/* 로그인 상태별 버튼 표시/숨김 */
+.auth-buttons-logged-out {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.auth-buttons-logged-in {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* 모델하우스 카드 스타일 */
+.preview-image.premium-office {
+    background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+}
+
+.preview-image.startup-office {
+    background: linear-gradient(135deg, #607d8b 0%, #455a64 100%);
+}
+
 /* Hero Section */
 .hero-section {
     text-align: center;

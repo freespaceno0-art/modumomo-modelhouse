@@ -12,28 +12,28 @@
 <body>
     <!-- Top Right Auth Buttons -->
     <div class="top-auth-buttons">
-        <!-- 로그인하지 않은 경우 -->
-        <div th:if="${!isLoggedIn}">
-            <a href="/login" class="auth-btn">로그인</a>
+        <!-- 로그인하지 않은 경우 (기본 상태) -->
+        <div class="auth-buttons-logged-out">
+            <a href="login.html" class="auth-btn">로그인</a>
             <span class="separator">/</span>
-            <a href="/signup" class="auth-btn">회원가입</a>
+            <a href="signup.html" class="auth-btn">회원가입</a>
         </div>
         
-        <!-- 로그인한 경우 -->
-        <div th:if="${isLoggedIn}">
+        <!-- 로그인한 경우 (JavaScript로 동적 표시) -->
+        <div class="auth-buttons-logged-in" style="display: none;">
             <span class="user-info">
                 <i class="fas fa-user"></i>
-                <span th:text="${currentUser}">사용자</span>
+                <span class="current-user">사용자</span>
             </span>
             <span class="separator">|</span>
-            <a href="/logout" class="auth-btn logout-btn">
+            <a href="#" class="auth-btn logout-btn" onclick="logout()">
                 <i class="fas fa-sign-out-alt"></i> 로그아웃
             </a>
             
-            <!-- 관리자인 경우에만 관리자 버튼 표시 -->
-            <div th:if="${isAdmin}" class="admin-section">
+            <!-- 관리자 버튼 (JavaScript로 동적 표시) -->
+            <div class="admin-section" style="display: none;">
                 <span class="separator">|</span>
-                <a href="/admin" class="auth-btn admin-link">
+                <a href="admin.html" class="auth-btn admin-link">
                     <i class="fas fa-user-shield"></i> 관리자
                 </a>
             </div>
@@ -68,38 +68,40 @@
             </div>
             <div class="carousel-container">
                 <div class="carousel-track">
-                    <!-- 동적으로 모델하우스 카드 생성 -->
-                    <div th:each="house : ${recentModelHouses}" 
-                         th:class="'carousel-item'" 
-                         th:attr="data-model-id=${house.id}, data-lat=${house.latitude}, data-lng=${house.longitude}">
+                    <!-- 샘플 모델하우스 카드들 -->
+                    <div class="carousel-item" data-model-id="1" data-lat="37.5447" data-lng="127.0559">
                         <div class="model-preview">
                             <div class="preview-image-container">
-                                <img th:if="${house.representativeImage != null and house.representativeImage != ''}" 
-                                     th:src="${house.representativeImage}" 
-                                     th:alt="${house.houseName}" 
-                                     class="representative-image">
-                                <div th:if="${house.representativeImage == null or house.representativeImage == ''}" 
-                                     class="preview-image" th:class="'preview-image ' + ${#strings.toLowerCase(house.houseCategory)}">
+                                <div class="preview-image modern-house">
                                     <i class="fas fa-home"></i>
-                                    <div class="house-type" th:text="${house.houseCategory}">카테고리</div>
+                                    <div class="house-type">모던</div>
                                 </div>
                             </div>
-                            <h3 class="model-title" th:text="${house.houseName}">모델하우스 이름</h3>
+                            <h3 class="model-title">서울숲 모던하우스</h3>
                         </div>
                     </div>
                     
-                    <!-- 모델하우스가 없을 경우 기본 카드 표시 -->
-                    <div th:if="${#lists.isEmpty(recentModelHouses)}" class="carousel-item">
+                    <div class="carousel-item" data-model-id="2" data-lat="37.5248" data-lng="127.0400">
                         <div class="model-preview">
-                            <div class="preview-image modern-house">
-                                <i class="fas fa-home"></i>
-                                <div class="house-type">모던</div>
+                            <div class="preview-image-container">
+                                <div class="preview-image premium-office">
+                                    <i class="fas fa-building"></i>
+                                    <div class="house-type">프리미엄</div>
+                                </div>
                             </div>
-                            <h3 class="model-title">등록된 모델하우스가 없습니다</h3>
-                            <div class="house-info">
-                                <span class="info-item"><i class="fas fa-info-circle"></i> 관리자 페이지에서 등록해주세요</span>
+                            <h3 class="model-title">강남 프리미엄 오피스텔</h3>
+                        </div>
+                    </div>
+                    
+                    <div class="carousel-item" data-model-id="3" data-lat="37.5563" data-lng="126.9236">
+                        <div class="model-preview">
+                            <div class="preview-image-container">
+                                <div class="preview-image startup-office">
+                                    <i class="fas fa-rocket"></i>
+                                    <div class="house-type">창업</div>
+                                </div>
                             </div>
-                            <p class="house-description">새로운 모델하우스를 등록하면 여기에 표시됩니다</p>
+                            <h3 class="model-title">홍대 창업 오피스</h3>
                         </div>
                     </div>
                 </div>
@@ -107,6 +109,6 @@
         </section>
     </main>
 
-    <script th:src="@{/js/script.js}"></script>
+    <script src="js/script.js"></script>
 </body>
 </html>
