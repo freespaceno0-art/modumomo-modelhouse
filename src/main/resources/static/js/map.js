@@ -671,7 +671,7 @@ function copyAddress() {
 
 // 페이지 로드 시 지도 초기화
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('지도 페이지 로드됨');
+    console.log('지도 페이지 DOM 로드됨');
     
     // 검색 기능 초기화
     initSearch();
@@ -698,14 +698,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Kakao Maps API가 이미 로드된 경우 지도 초기화
-    if (typeof kakao !== 'undefined' && kakao.maps) {
-        console.log('Kakao Maps API가 이미 로드됨, 지도 초기화 시작');
-        initMap();
-    } else {
-        console.log('Kakao Maps API 로딩 대기 중...');
-        // API 로딩 완료를 기다림 (HTML에서 처리됨)
-    }
+    // 지도 초기화는 HTML에서 처리됨 (window.load 이벤트)
+    console.log('지도 초기화는 페이지 로드 완료 후 HTML에서 처리됩니다.');
 });
 
 // 검색 기능 초기화
