@@ -13,17 +13,17 @@
     <!-- Top Right Auth Buttons -->
     <div class="top-auth-buttons">
         <!-- 로그인하지 않은 경우 -->
-        <div th:if="${!isLoggedIn}">
+        <div id="guestButtons">
             <a href="/login" class="auth-btn">로그인</a>
             <span class="separator">/</span>
             <a href="/signup" class="auth-btn">회원가입</a>
         </div>
         
         <!-- 로그인한 경우 -->
-        <div th:if="${isLoggedIn}">
+        <div id="userButtons" style="display: none;">
             <span class="user-info">
                 <i class="fas fa-user"></i>
-                <span th:text="${currentUser}">사용자</span>
+                <span id="username">사용자</span>
             </span>
             <span class="separator">|</span>
             <a href="/logout" class="auth-btn logout-btn">
@@ -31,7 +31,7 @@
             </a>
             
             <!-- 관리자인 경우에만 관리자 버튼 표시 -->
-            <div th:if="${isAdmin}" class="admin-section">
+            <div id="adminSection" style="display: none;">
                 <span class="separator">|</span>
                 <a href="/admin" class="auth-btn admin-link">
                     <i class="fas fa-user-shield"></i> 관리자
@@ -108,5 +108,40 @@
     </main>
 
     <script src="/js/script.js"></script>
+    <script src="/js/auth-simulator.js"></script>
+    <script>
+        // 페이지 로드 시 인증 상태 확인
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthStatus();
+        });
+        
+        // 인증 상태 확인 및 버튼 표시 함수
+        function checkAuthStatus() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            const isAdmin = localStorage.getItem('isAdmin') === 'true';
+            const currentUsername = localStorage.getItem('username') || '사용자';
+            
+            const guestButtons = document.getElementById('guestButtons');
+            const userButtons = document.getElementById('userButtons');
+            const adminSection = document.getElementById('adminSection');
+            const usernameSpan = document.getElementById('username');
+            
+            if (isLoggedIn) {
+                guestButtons.style.display = 'none';
+                userButtons.style.display = 'block';
+                usernameSpan.textContent = currentUsername;
+                
+                if (isAdmin) {
+                    adminSection.style.display = 'block';
+                } else {
+                    adminSection.style.display = 'none';
+                }
+            } else {
+                guestButtons.style.display = 'block';
+                userButtons.style.display = 'none';
+                adminSection.style.display = 'none';
+            }
+        }
+    </script>
 </body>
 </html>
