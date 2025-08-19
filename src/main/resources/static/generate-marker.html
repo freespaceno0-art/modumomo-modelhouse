@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>마커 이미지 생성 및 저장</title>
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+        }
+        
+        .info {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-left: 5px solid #26a69a;
+        }
+        
+        .info h3 {
+            color: #26a69a;
+            margin-top: 0;
+        }
+        
+        .info p {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+        
+        .preview {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .preview h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        
+        #previewCanvas {
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .button {
+            display: block;
+            width: 100%;
+            max-width: 300px;
+            margin: 20px auto;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #26a69a, #00897b);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(38, 166, 154, 0.3);
+        }
+        
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(38, 166, 154, 0.4);
+        }
+        
+        .button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .status {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .note {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        
+        .note strong {
+            color: #856404;
+        }
+        
+        .note p {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 마커 이미지 생성 및 저장</h1>
+        
+        <div class="info">
+            <h3>📋 마커 정보</h3>
+            <p><strong>크기:</strong> 40x50 픽셀</p>
+            <p><strong>색상:</strong> 밝은 청록색/터키스 그라데이션</p>
+            <p><strong>모양:</strong> 핀/물방울 형태</p>
+            <p><strong>내부 요소:</strong> 검은색 테두리 + 청록색 채움 사각형</p>
+        </div>
+        
+        <div class="preview">
+            <h3>👀 미리보기</h3>
+            <canvas id="previewCanvas" width="40" height="50"></canvas>
+        </div>
+        
+        <button class="button" id="generateBtn" onclick="generateAndSaveMarker()">
+            🎨 마커 이미지 생성 및 저장
+        </button>
+        
+        <div id="status" class="status info" style="display: none;">
+            마커 이미지 생성을 시작합니다...
+        </div>
+        
+        <div class="note">
+            <strong>💡 참고사항:</strong>
+            <p>이 버튼을 클릭하면 Canvas API를 사용하여 마커 이미지를 생성하고, 
+            자동으로 서버의 <code>src/main/resources/static/images/</code> 폴더에 저장합니다.</p>
+            <p>저장이 완료되면 지도 페이지와 관리자 페이지에서 커스텀 마커가 표시됩니다.</p>
+        </div>
+    </div>
+
+    <script src="js/generate-marker.js"></script>
+    <script>
+        // 미리보기 캔버스에 마커 그리기
+        function drawPreview() {
+            const canvas = document.getElementById('previewCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // 그림자 효과
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+            ctx.shadowBlur = 6;
+            ctx.shadowOffsetX = 3;
+            ctx.shadowOffsetY = 3;
+            
+            // 그라데이션 배경
+            const gradient = ctx.createLinearGradient(0, 0, 40, 50);
+            gradient.addColorStop(0, '#00bcd4');
+            gradient.addColorStop(0.5, '#00acc1');
+            gradient.addColorStop(1, '#0097a7');
+            
+            // 핀/물방울 모양 그리기
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.moveTo(20, 0);
+            ctx.lineTo(33, 30);
+            ctx.lineTo(20, 27);
+            ctx.lineTo(7, 30);
+            ctx.lineTo(20, 0);
+            ctx.fill();
+            
+            // 그림자 효과 제거
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+            
+            // 내부 검은색 사각형 테두리
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(12, 5, 16, 16);
+            
+            // 내부에 마커 본체와 유사한 청록색으로 채워진 사각형
+            ctx.fillStyle = '#00bcd4';
+            ctx.fillRect(13, 6, 14, 14);
+        }
+        
+        // 마커 생성 및 저장
+        function generateAndSaveMarker() {
+            const generateBtn = document.getElementById('generateBtn');
+            const status = document.getElementById('status');
+            
+            // 버튼 비활성화
+            generateBtn.disabled = true;
+            generateBtn.textContent = '🔄 생성 중...';
+            
+            // 상태 표시
+            status.style.display = 'block';
+            status.className = 'status info';
+            status.textContent = '마커 이미지를 생성하고 서버에 저장하는 중...';
+            
+            // Canvas에서 이미지 생성
+            const canvas = document.getElementById('previewCanvas');
+            canvas.toBlob(function(blob) {
+                // FormData 생성
+                const formData = new FormData();
+                formData.append('markerImage', blob, 'custom-marker.png');
+                
+                // 서버에 이미지 저장 요청
+                fetch('/api/marker/save', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        status.className = 'status success';
+                        status.textContent = '✅ 마커 이미지가 성공적으로 저장되었습니다!';
+                        console.log('마커 이미지 저장 완료:', data.path);
+                    } else {
+                        status.className = 'status error';
+                        status.textContent = '❌ 마커 이미지 저장 실패: ' + data.message;
+                        console.error('마커 이미지 저장 실패:', data.message);
+                    }
+                })
+                .catch(error => {
+                    status.className = 'status error';
+                    status.textContent = '❌ 마커 이미지 저장 중 오류 발생: ' + error.message;
+                    console.error('마커 이미지 저장 중 오류:', error);
+                })
+                .finally(() => {
+                    // 버튼 재활성화
+                    generateBtn.disabled = false;
+                    generateBtn.textContent = '🎨 마커 이미지 생성 및 저장';
+                });
+            }, 'image/png');
+        }
+        
+        // 페이지 로드 시 미리보기 그리기
+        document.addEventListener('DOMContentLoaded', function() {
+            drawPreview();
+        });
+    </script>
+</body>
+</html>
