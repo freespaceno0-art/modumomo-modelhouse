@@ -41,7 +41,6 @@ body {
     color: #00897b;
     background: rgba(38, 166, 154, 0.1);
     border-color: rgba(38, 166, 154, 0.3);
-    transform: translateY(-2px);
 }
 
 .top-auth-buttons .admin-link {
@@ -204,7 +203,6 @@ body {
 }
 
 .search-btn:hover {
-    transform: scale(1.05);
     background: linear-gradient(135deg, #b2dfdb 0%, #80cbc4 50%, #4db6ac 100%);
     box-shadow: 0 4px 15px rgba(128, 203, 196, 0.6);
 }
@@ -232,7 +230,7 @@ body {
     position: absolute;
     bottom: -10px;
     left: 50%;
-    transform: translateX(-50%);
+    margin-left: -40px; /* transform 대신 margin 사용 */
     width: 80px;
     height: 4px;
     background: linear-gradient(135deg, #26a69a 0%, #4db6ac 50%, #80cbc4 100%);
@@ -536,7 +534,7 @@ body {
 .carousel-btn {
     position: absolute;
     top: 50%;
-    transform: translateY(-50%);
+    margin-top: -25px; /* transform 대신 margin 사용 */
     background: rgba(255, 255, 255, 0.9);
     border: none;
     border-radius: 50%;
@@ -553,7 +551,6 @@ body {
 
 .carousel-btn:hover {
     background: rgba(255, 255, 255, 1);
-    transform: translateY(-50%) scale(1.1);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
