@@ -8,7 +8,7 @@
 ### 1. Firebase 프로젝트 생성
 1. [Firebase Console](https://console.firebase.google.com/)에 접속
 2. "프로젝트 추가" 클릭
-3. 프로젝트 이름: `modumomo-modelhouse`
+3. 프로젝트 이름: `swift-cursor-467917-v4`
 4. Google Analytics 활성화 (선택사항)
 5. 프로젝트 생성 완료
 
@@ -89,7 +89,7 @@ Value: modumomo-modelhouse.web.app
 ## 📱 배포 후 확인
 
 ### 1. 기본 도메인 확인
-- `https://modumomo-modelhouse.web.app` 접속
+- `https://swift-cursor-467917-v4.web.app` 접속
 - 정상적으로 페이지가 로드되는지 확인
 
 ### 2. 기능 테스트
