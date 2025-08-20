@@ -11,12 +11,12 @@
 <body>
     <!-- Top Right Auth Buttons -->
     <div class="top-auth-buttons">
-        <a th:if="${!isLoggedIn}" href="/login" class="auth-btn">로그인</a>
-        <a th:if="${!isLoggedIn}" href="/signup" class="auth-btn">회원가입</a>
-        <span th:if="${isLoggedIn && !isAdmin}" class="separator">|</span>
-        <a th:if="${isLoggedIn && isAdmin}" href="/admin" class="auth-btn admin-link">관리자</a>
-        <div th:if="${isLoggedIn}" class="user-info">
-            <span th:text="${currentUser?.username}">사용자</span>
+        <a href="/login" class="auth-btn" id="loginBtn">로그인</a>
+        <a href="/signup" class="auth-btn" id="signupBtn">회원가입</a>
+        <span class="separator" id="separator" style="display: none;">|</span>
+        <a href="/admin" class="auth-btn admin-link" id="adminBtn" style="display: none;">관리자</a>
+        <div class="user-info" id="userInfo" style="display: none;">
+            <span id="username">사용자</span>
             <a href="/logout" class="auth-btn logout-btn">로그아웃</a>
         </div>
     </div>
@@ -121,6 +121,41 @@
 
     <!-- Kakao Maps API -->
     <script>
+        // 인증 상태 확인 및 버튼 표시 함수
+        function checkAuthStatus() {
+            // 로컬 스토리지에서 인증 상태 확인
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            const isAdmin = localStorage.getItem('isAdmin') === 'true';
+            const currentUsername = localStorage.getItem('username') || '사용자';
+            
+            const loginBtn = document.getElementById('loginBtn');
+            const signupBtn = document.getElementById('signupBtn');
+            const separator = document.getElementById('separator');
+            const adminBtn = document.getElementById('adminBtn');
+            const userInfo = document.getElementById('userInfo');
+            const usernameSpan = document.getElementById('username');
+            
+            if (isLoggedIn) {
+                loginBtn.style.display = 'none';
+                signupBtn.style.display = 'none';
+                separator.style.display = 'inline-block';
+                if (isAdmin) {
+                    adminBtn.style.display = 'inline-block';
+                } else {
+                    adminBtn.style.display = 'none';
+                }
+                userInfo.style.display = 'block';
+                usernameSpan.textContent = currentUsername;
+            } else {
+                loginBtn.style.display = 'inline-block';
+                signupBtn.style.display = 'inline-block';
+                separator.style.display = 'none';
+                adminBtn.style.display = 'none';
+                userInfo.style.display = 'none';
+                usernameSpan.textContent = '사용자';
+            }
+        }
+        
         // Kakao Maps API 로딩 상태 관리
         window.kakaoMapsLoaded = false;
         window.kakaoMapsError = false;
@@ -157,6 +192,9 @@
         // 페이지 로드 완료 후 지도 초기화
         window.addEventListener('load', function() {
             console.log('페이지 로드 완료, 지도 초기화 시작');
+            
+            // 인증 상태 확인 및 버튼 표시
+            checkAuthStatus();
             
             // Kakao Maps API가 로드되었는지 확인
             if (window.kakaoMapsLoaded && typeof kakao !== 'undefined' && kakao.maps) {
@@ -202,5 +240,6 @@
         });
     </script>
     <script src="/js/map.js"></script>
+    <script src="/js/auth-simulator.js"></script>
 </body>
 </html>

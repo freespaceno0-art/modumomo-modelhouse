@@ -1,16 +1,24 @@
 // Simple Model House Cards Display
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('메인 페이지 JavaScript 로드됨');
+    
     const carouselTrack = document.querySelector('.carousel-track');
     
     if (carouselTrack) {
+        console.log('캐러셀 트랙 찾음:', carouselTrack);
+        
         // 카드 클릭 이벤트 추가
         const items = carouselTrack.querySelectorAll('.carousel-item');
+        console.log('캐러셀 아이템 개수:', items.length);
         
         items.forEach((item, index) => {
             item.addEventListener('click', function() {
+                console.log('카드 클릭됨:', index);
                 const modelId = this.getAttribute('data-model-id');
                 const lat = this.getAttribute('data-lat');
                 const lng = this.getAttribute('data-lng');
+                
+                console.log('카드 데이터:', { modelId, lat, lng });
                 
                 // 클릭 애니메이션
                 this.style.transform = 'scale(0.95)';
@@ -58,11 +66,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 // 카드 이동 로직 제거
             }
         });
+    } else {
+        console.error('캐러셀 트랙을 찾을 수 없습니다');
     }
     
     // Navigation function
     function navigateToMap(lat, lng, modelId) {
-        const mapUrl = `/map?lat=${lat}&lng=${lng}&modelId=${modelId}`;
+        console.log('지도 페이지로 이동:', { lat, lng, modelId });
+        // Firebase Hosting용 경로 수정
+        const mapUrl = `map.html?lat=${lat}&lng=${lng}&modelId=${modelId}`;
+        console.log('이동할 URL:', mapUrl);
         window.location.href = mapUrl;
     }
     
@@ -73,14 +86,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const searchBtn = document.querySelector('.search-btn');
     
     if (searchInput && searchBtn) {
+        console.log('검색 요소들 찾음:', { searchInput, searchBtn });
+        
         // Search button click event
         searchBtn.addEventListener('click', function() {
+            console.log('검색 버튼 클릭됨');
             performSearch();
         });
         
         // Enter key press event
         searchInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
+                console.log('검색 엔터키 입력됨');
                 performSearch();
             }
         });
@@ -88,6 +105,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // Search function
         function performSearch() {
             const searchTerm = searchInput.value.trim();
+            console.log('검색어:', searchTerm);
+            
             if (searchTerm) {
                 // Add search animation
                 searchBtn.style.transform = 'scale(0.95)';
@@ -96,7 +115,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 }, 150);
                 
                 // Navigate to map page with search term
-                const mapUrl = `/map?search=${encodeURIComponent(searchTerm)}`;
+                const mapUrl = `map.html?search=${encodeURIComponent(searchTerm)}`;
+                console.log('검색 결과로 이동할 URL:', mapUrl);
                 window.location.href = mapUrl;
             }
         }
