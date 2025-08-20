@@ -159,17 +159,36 @@
         // Kakao Maps API 로딩 상태 관리
         window.kakaoMapsLoaded = false;
         window.kakaoMapsError = false;
+        window.kakaoMapsReady = false;
         
         // API 로딩 완료 콜백
         window.kakaoMapsCallback = function() {
             console.log('Kakao Maps API 로딩 완료 (콜백)');
             window.kakaoMapsLoaded = true;
             
-            // 지도 초기화 함수가 준비되면 실행
-            if (typeof initMap === 'function') {
-                console.log('콜백에서 지도 초기화 시작');
-                initMap();
-            }
+            // API가 완전히 준비될 때까지 대기
+            const checkReady = setInterval(() => {
+                if (typeof kakao !== 'undefined' && kakao.maps && kakao.maps.LatLng) {
+                    clearInterval(checkReady);
+                    console.log('Kakao Maps API 완전히 준비됨');
+                    window.kakaoMapsReady = true;
+                    
+                    // 지도 초기화 함수가 준비되면 실행
+                    if (typeof initMap === 'function') {
+                        console.log('콜백에서 지도 초기화 시작');
+                        initMap();
+                    }
+                }
+            }, 100);
+            
+            // 10초 후 타임아웃
+            setTimeout(() => {
+                if (checkReady) {
+                    clearInterval(checkReady);
+                    console.error('Kakao Maps API 준비 타임아웃');
+                    window.kakaoMapsError = true;
+                }
+            }, 10000);
         };
         
         // API 로딩 실패 처리
@@ -196,9 +215,9 @@
             // 인증 상태 확인 및 버튼 표시
             checkAuthStatus();
             
-            // Kakao Maps API가 로드되었는지 확인
-            if (window.kakaoMapsLoaded && typeof kakao !== 'undefined' && kakao.maps) {
-                console.log('Kakao Maps API 로드됨, 지도 초기화 시작');
+            // Kakao Maps API가 완전히 준비되었는지 확인
+            if (window.kakaoMapsReady && typeof kakao !== 'undefined' && kakao.maps && kakao.maps.LatLng) {
+                console.log('Kakao Maps API 완전히 준비됨, 지도 초기화 시작');
                 if (typeof initMap === 'function') {
                     initMap();
                 }
@@ -211,9 +230,9 @@
                 console.log('Kakao Maps API 로딩 대기 중...');
                 // API 로딩 대기
                 const checkKakao = setInterval(function() {
-                    if (window.kakaoMapsLoaded && typeof kakao !== 'undefined' && kakao.maps) {
+                    if (window.kakaoMapsReady && typeof kakao !== 'undefined' && kakao.maps && kakao.maps.LatLng) {
                         clearInterval(checkKakao);
-                        console.log('Kakao Maps API 로딩 완료, 지도 초기화 시작');
+                        console.log('Kakao Maps API 완전히 준비됨, 지도 초기화 시작');
                         if (typeof initMap === 'function') {
                             initMap();
                         }
@@ -224,9 +243,9 @@
                             showMapError();
                         }
                     }
-                }, 100);
+                }, 200);
                 
-                // 15초 후 타임아웃
+                // 20초 후 타임아웃
                 setTimeout(() => {
                     if (checkKakao) {
                         clearInterval(checkKakao);
@@ -235,7 +254,7 @@
                             showMapError();
                         }
                     }
-                }, 15000);
+                }, 20000);
             }
         });
     </script>

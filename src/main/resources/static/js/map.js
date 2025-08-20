@@ -55,15 +55,16 @@ async function initMap() {
         console.log('지도 컨테이너 찾음:', mapContainer);
         
         // Kakao Maps API 확인 (더 안전한 방식)
-        if (typeof kakao === 'undefined' || !kakao.maps || !kakao.maps.LatLng) {
+        if (typeof kakao === 'undefined' || !kakao.maps || !kakao.maps.LatLng || typeof kakao.maps.LatLng !== 'function') {
             console.error('Kakao Maps API가 완전히 로드되지 않았습니다');
             console.log('kakao 객체:', typeof kakao);
             console.log('kakao.maps:', kakao?.maps);
             console.log('kakao.maps.LatLng:', kakao?.maps?.LatLng);
+            console.log('kakao.maps.LatLng 타입:', typeof kakao?.maps?.LatLng);
             
             // API 재로딩 시도
             setTimeout(() => {
-                if (typeof kakao !== 'undefined' && kakao.maps && kakao.maps.LatLng) {
+                if (typeof kakao !== 'undefined' && kakao.maps && kakao.maps.LatLng && typeof kakao.maps.LatLng === 'function') {
                     console.log('API 재로딩 후 지도 초기화 재시도');
                     initMap();
                 } else {
