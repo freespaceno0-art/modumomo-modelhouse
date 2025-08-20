@@ -166,29 +166,35 @@
             console.log('Kakao Maps API 로딩 완료 (콜백)');
             window.kakaoMapsLoaded = true;
             
-            // API가 완전히 준비될 때까지 대기
+            // API가 완전히 준비될 때까지 대기 (더 안전한 방식)
             const checkReady = setInterval(() => {
-                if (typeof kakao !== 'undefined' && kakao.maps && kakao.maps.LatLng) {
+                if (typeof kakao !== 'undefined' && kakao.maps && kakao.maps.LatLng && typeof kakao.maps.LatLng === 'function') {
                     clearInterval(checkReady);
-                    console.log('Kakao Maps API 완전히 준비됨');
+                    console.log('Kakao Maps API 완전히 준비됨 - LatLng 클래스 확인됨');
                     window.kakaoMapsReady = true;
                     
                     // 지도 초기화 함수가 준비되면 실행
                     if (typeof initMap === 'function') {
                         console.log('콜백에서 지도 초기화 시작');
-                        initMap();
+                        setTimeout(() => initMap(), 100); // 약간의 지연 후 실행
                     }
+                } else {
+                    console.log('API 준비 대기 중...', {
+                        kakao: typeof kakao,
+                        maps: !!kakao?.maps,
+                        LatLng: typeof kakao?.maps?.LatLng
+                    });
                 }
-            }, 100);
+            }, 200); // 200ms마다 체크
             
-            // 10초 후 타임아웃
+            // 15초 후 타임아웃
             setTimeout(() => {
                 if (checkReady) {
                     clearInterval(checkReady);
                     console.error('Kakao Maps API 준비 타임아웃');
                     window.kakaoMapsError = true;
                 }
-            }, 10000);
+            }, 15000);
         };
         
         // API 로딩 실패 처리
@@ -202,8 +208,8 @@
         };
     </script>
     
-    <!-- Kakao Maps API 로딩 -->
-    <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=91cb0bd7449dd781a29428e986969795&libraries=services&autoload=false" 
+    <!-- Kakao Maps API 로딩 (autoload=true로 변경) -->
+    <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=91cb0bd7449dd781a29428e986969795&libraries=services" 
             onload="window.kakaoMapsCallback()" 
             onerror="window.kakaoMapsErrorCallback()"></script>
     
@@ -216,10 +222,10 @@
             checkAuthStatus();
             
             // Kakao Maps API가 완전히 준비되었는지 확인
-            if (window.kakaoMapsReady && typeof kakao !== 'undefined' && kakao.maps && kakao.maps.LatLng) {
+            if (window.kakaoMapsReady && typeof kakao !== 'undefined' && kakao.maps && kakao.maps.LatLng && typeof kakao.maps.LatLng === 'function') {
                 console.log('Kakao Maps API 완전히 준비됨, 지도 초기화 시작');
                 if (typeof initMap === 'function') {
-                    initMap();
+                    setTimeout(() => initMap(), 100); // 약간의 지연 후 실행
                 }
             } else if (window.kakaoMapsError) {
                 console.error('Kakao Maps API 로딩 실패 상태');
@@ -230,11 +236,11 @@
                 console.log('Kakao Maps API 로딩 대기 중...');
                 // API 로딩 대기
                 const checkKakao = setInterval(function() {
-                    if (window.kakaoMapsReady && typeof kakao !== 'undefined' && kakao.maps && kakao.maps.LatLng) {
+                    if (window.kakaoMapsReady && typeof kakao !== 'undefined' && kakao.maps && kakao.maps.LatLng && typeof kakao.maps.LatLng === 'function') {
                         clearInterval(checkKakao);
                         console.log('Kakao Maps API 완전히 준비됨, 지도 초기화 시작');
                         if (typeof initMap === 'function') {
-                            initMap();
+                            setTimeout(() => initMap(), 100); // 약간의 지연 후 실행
                         }
                     } else if (window.kakaoMapsError) {
                         clearInterval(checkKakao);
@@ -242,10 +248,17 @@
                         if (typeof showMapError === 'function') {
                             showMapError();
                         }
+                    } else {
+                        console.log('API 준비 상태 체크 중...', {
+                            ready: window.kakaoMapsReady,
+                            kakao: typeof kakao,
+                            maps: !!kakao?.maps,
+                            LatLng: typeof kakao?.maps?.LatLng
+                        });
                     }
-                }, 200);
+                }, 300); // 300ms마다 체크
                 
-                // 20초 후 타임아웃
+                // 25초 후 타임아웃
                 setTimeout(() => {
                     if (checkKakao) {
                         clearInterval(checkKakao);
@@ -254,7 +267,7 @@
                             showMapError();
                         }
                     }
-                }, 20000);
+                }, 25000);
             }
         });
     </script>

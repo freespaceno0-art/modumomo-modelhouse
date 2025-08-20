@@ -706,42 +706,25 @@ function copyAddress() {
     });
 }
 
-// 페이지 로드 시 지도 초기화
+// DOM 로드 완료 시 지도 초기화
 document.addEventListener('DOMContentLoaded', function() {
     console.log('지도 페이지 DOM 로드됨');
     
-    // 검색 기능 초기화
-    initSearch();
+    // 이미 초기화되었다면 건너뛰기
+    if (window.mapInitialized) {
+        console.log('지도가 이미 초기화되었습니다. DOM 로드 이벤트 무시.');
+        return;
+    }
     
-    // 윈도우 리사이즈 시 지도 크기 조정
-    window.addEventListener('resize', function() {
-        if (map) {
-            map.relayout();
-        }
-    });
-    
-    // 키보드 단축키
-    document.addEventListener('keydown', function(e) {
-        switch(e.key) {
-            case 'Escape':
-                closeInfo();
-                break;
-            case 'Home':
-                resetMap();
-                break;
-            case 'm':
-                showAllMarkers();
-                break;
-        }
-    });
-    
-    // 지도 초기화 보장 (DOM 로드 완료 시)
-    if (typeof kakao !== 'undefined' && kakao.maps) {
+    // Kakao Maps API가 이미 준비된 경우 지도 초기화
+    if (typeof kakao !== 'undefined' && kakao.maps && kakao.maps.LatLng && typeof kakao.maps.LatLng === 'function') {
         console.log('DOM 로드 시 Kakao Maps API가 이미 준비됨, 지도 초기화 시작');
-        initMap();
+        if (typeof initMap === 'function') {
+            window.mapInitialized = true; // 플래그 설정
+            initMap();
+        }
     } else {
-        console.log('DOM 로드 시 Kakao Maps API 대기 중...');
-        // API 로딩 완료를 기다림 (HTML의 window.load 이벤트에서 처리됨)
+        console.log('DOM 로드 시 Kakao Maps API가 아직 준비되지 않음, 대기 중...');
     }
 });
 
