@@ -228,38 +228,76 @@ h1, h2, h3, h4, h5, h6, p, span, div {
 /* 줌 애니메이션 개선 */
 #map {
     transition: all 0.3s ease;
+    /* 타일 깨짐 방지 */
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    image-rendering: pixelated;
+    /* 부드러운 줌 */
+    transform-origin: center center;
+    will-change: transform;
+}
+
+/* 지도 컨테이너 줌 상태 */
+.map-container {
+    position: relative;
+    overflow: hidden;
+    /* 부드러운 전환 */
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 지도 로딩 상태 */
+.map-container.loading {
+    opacity: 0.8;
+    filter: blur(1px);
+}
+
+.map-container.loaded {
+    opacity: 1;
+    filter: blur(0);
+}
+
+/* 타일 로딩 애니메이션 */
+#map img {
+    transition: opacity 0.3s ease;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+}
+
+/* 줌 중일 때 지도 스타일 */
+#map.zooming {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* 마커 줌 효과 */
 .marker-zoom-in {
     transform: scale(1.2);
-    transition: transform 0.3s ease;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .marker-zoom-out {
     transform: scale(0.8);
-    transition: transform 0.3s ease;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* 지도 컨테이너 */
-.map-container {
-    position: relative;
-    width: 100%;
-    height: 100vh;
-    background: #f8f9fa;
-    overflow: hidden;
+/* 로딩 스피너 개선 */
+.loading-spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-top: 4px solid #4CAF50;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    z-index: 1001;
+    display: none;
 }
 
-/* 지도 요소 */
-#map {
-    width: 100% !important;
-    height: 100% !important;
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    border: none !important;
-    outline: none !important;
-    z-index: 1 !important;
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
 /* Kakao Maps API 내부 요소 강제 스타일 */

@@ -35,6 +35,19 @@
     <div class="map-container">
         <div id="map"></div>
         
+        <!-- Map Control Buttons -->
+        <div class="map-controls">
+            <button class="map-control-btn" onclick="resetMapView()" title="기본 보기로 복원">
+                <i class="fas fa-home"></i>
+            </button>
+            <button class="map-control-btn" onclick="smoothZoomToLevel(15)" title="가까이 보기">
+                <i class="fas fa-search-plus"></i>
+            </button>
+            <button class="map-control-btn" onclick="smoothZoomToLevel(5)" title="멀리 보기">
+                <i class="fas fa-search-minus"></i>
+            </button>
+        </div>
+        
         <!-- Model House Info Panel -->
         <div class="modelhouse-info" id="modelhouseInfo">
             <button class="close-info" onclick="closeInfo()">&times;</button>
