@@ -40,27 +40,42 @@ async function loadModelHouses() {
     }
 }
 
-// 지도 초기화 함수
+// 지도 초기화
 async function initMap() {
-    console.log('=== 지도 초기화 시작 ===');
-    
     try {
+        console.log('=== 지도 초기화 시작 ===');
+        
         // 지도 컨테이너 확인
         const mapContainer = document.getElementById('map');
         if (!mapContainer) {
-            console.error('지도 컨테이너를 찾을 수 없습니다!');
+            console.error('지도 컨테이너를 찾을 수 없습니다');
             return;
         }
         
         console.log('지도 컨테이너 찾음:', mapContainer);
         
-        // Kakao Maps API 확인
-        if (typeof kakao === 'undefined' || !kakao.maps) {
-            console.error('Kakao Maps API가 로드되지 않았습니다!');
+        // Kakao Maps API 확인 (더 안전한 방식)
+        if (typeof kakao === 'undefined' || !kakao.maps || !kakao.maps.LatLng) {
+            console.error('Kakao Maps API가 완전히 로드되지 않았습니다');
+            console.log('kakao 객체:', typeof kakao);
+            console.log('kakao.maps:', kakao?.maps);
+            console.log('kakao.maps.LatLng:', kakao?.maps?.LatLng);
+            
+            // API 재로딩 시도
+            setTimeout(() => {
+                if (typeof kakao !== 'undefined' && kakao.maps && kakao.maps.LatLng) {
+                    console.log('API 재로딩 후 지도 초기화 재시도');
+                    initMap();
+                } else {
+                    console.error('API 재로딩 실패, 오류 표시');
+                    showMapError();
+                }
+            }, 1000);
             return;
         }
         
         console.log('Kakao Maps API 확인됨');
+        console.log('사용 가능한 API 메서드들:', Object.keys(kakao.maps));
         
         // URL 파라미터에서 좌표 가져오기
         const urlParams = new URLSearchParams(window.location.search);
@@ -69,43 +84,75 @@ async function initMap() {
         
         console.log('지도 좌표:', lat, lng);
         
-        // 지도 생성
-        const mapOptions = {
-            center: new kakao.maps.LatLng(lat, lng),
-            level: 8
-        };
-        
-        console.log('지도 옵션 설정:', mapOptions);
+        // 지도 생성 (더 안전한 방식)
+        let mapOptions;
+        try {
+            mapOptions = {
+                center: new kakao.maps.LatLng(lat, lng),
+                level: 8
+            };
+            console.log('지도 옵션 설정 성공:', mapOptions);
+        } catch (latLngError) {
+            console.error('LatLng 생성 실패:', latLngError);
+            // 대안 방법 시도
+            try {
+                mapOptions = {
+                    center: { lat: lat, lng: lng },
+                    level: 8
+                };
+                console.log('대안 지도 옵션 사용:', mapOptions);
+            } catch (altError) {
+                console.error('대안 방법도 실패:', altError);
+                showMapError();
+                return;
+            }
+        }
         
         // 지도 인스턴스 생성
-        map = new kakao.maps.Map(mapContainer, mapOptions);
-        
-        if (!map) {
-            console.error('지도 인스턴스 생성 실패!');
+        let mapInstance;
+        try {
+            mapInstance = new kakao.maps.Map(mapContainer, mapOptions);
+            console.log('지도 인스턴스 생성 성공:', mapInstance);
+        } catch (mapError) {
+            console.error('지도 인스턴스 생성 실패:', mapError);
+            showMapError();
             return;
         }
         
-        console.log('지도 인스턴스 생성 성공:', map);
+        map = mapInstance;
         
         // 지도 로딩 완료 이벤트
-        kakao.maps.event.addListener(map, 'tilesloaded', function() {
-            console.log('지도 타일 로딩 완료');
-            mapContainer.classList.add('loaded');
-        });
+        try {
+            kakao.maps.event.addListener(map, 'tilesloaded', function() {
+                console.log('지도 타일 로딩 완료');
+                mapContainer.classList.add('loaded');
+            });
+        } catch (eventError) {
+            console.warn('지도 이벤트 리스너 추가 실패:', eventError);
+        }
         
         // 지도 로딩 실패 이벤트
-        kakao.maps.event.addListener(map, 'error', function(error) {
-            console.error('지도 로딩 오류:', error);
-        });
+        try {
+            kakao.maps.event.addListener(map, 'error', function(error) {
+                console.error('지도 로딩 오류:', error);
+            });
+        } catch (eventError) {
+            console.warn('지도 오류 이벤트 리스너 추가 실패:', eventError);
+        }
         
         // 모델하우스 데이터 로드 및 마커 표시
-        await loadModelHouses();
-        addModelHouseMarkers();
+        try {
+            await loadModelHouses();
+            addModelHouseMarkers();
+        } catch (dataError) {
+            console.warn('모델하우스 데이터 로드 실패:', dataError);
+        }
         
         console.log('=== 지도 초기화 완료 ===');
         
     } catch (error) {
         console.error('지도 초기화 중 오류 발생:', error);
+        console.error('오류 스택:', error.stack);
         showMapError();
     }
 }

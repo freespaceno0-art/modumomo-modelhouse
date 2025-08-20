@@ -68,38 +68,65 @@
             </div>
             <div class="carousel-container">
                 <div class="carousel-track">
-                    <!-- 동적으로 모델하우스 카드 생성 -->
-                    <div th:each="house : ${recentModelHouses}" 
-                         th:class="'carousel-item'" 
-                         th:attr="data-model-id=${house.id}, data-lat=${house.latitude}, data-lng=${house.longitude}">
+                    <!-- 정적 모델하우스 카드 (Firebase Hosting용) -->
+                    <div class="carousel-item" data-model-id="1" data-lat="37.5665" data-lng="126.9780">
                         <div class="model-preview">
                             <div class="preview-image-container">
-                                <img th:if="${house.representativeImage != null and house.representativeImage != ''}" 
-                                     th:src="${house.representativeImage}" 
-                                     th:alt="${house.houseName}" 
-                                     class="representative-image">
-                                <div th:if="${house.representativeImage == null or house.representativeImage == ''}" 
-                                     class="preview-image" th:class="'preview-image ' + ${#strings.toLowerCase(house.houseCategory)}">
+                                <div class="preview-image modern-house">
                                     <i class="fas fa-home"></i>
-                                    <div class="house-type" th:text="${house.houseCategory}">카테고리</div>
+                                    <div class="house-type">모던</div>
                                 </div>
                             </div>
-                            <h3 class="model-title" th:text="${house.houseName}">모델하우스 이름</h3>
+                            <h3 class="model-title">강남 모던하우스</h3>
                         </div>
                     </div>
                     
-                    <!-- 모델하우스가 없을 경우 기본 카드 표시 -->
-                    <div th:if="${#lists.isEmpty(recentModelHouses)}" class="carousel-item">
+                    <div class="carousel-item" data-model-id="2" data-lat="37.5248" data-lng="127.0400">
                         <div class="model-preview">
-                            <div class="preview-image modern-house">
-                                <i class="fas fa-home"></i>
-                                <div class="house-type">모던</div>
+                            <div class="preview-image-container">
+                                <div class="preview-image traditional-house">
+                                    <i class="fas fa-home"></i>
+                                    <div class="house-type">전통</div>
+                                </div>
                             </div>
-                            <h3 class="model-title">등록된 모델하우스가 없습니다</h3>
-                            <div class="house-info">
-                                <span class="info-item"><i class="fas fa-info-circle"></i> 관리자 페이지에서 등록해주세요</span>
+                            <h3 class="model-title">서초 전통하우스</h3>
+                        </div>
+                    </div>
+                    
+                    <div class="carousel-item" data-model-id="3" data-lat="37.5563" data-lng="126.9236">
+                        <div class="model-preview">
+                            <div class="preview-image-container">
+                                <div class="preview-image luxury-house">
+                                    <i class="fas fa-home"></i>
+                                    <div class="house-type">럭셔리</div>
+                                </div>
                             </div>
-                            <p class="house-description">새로운 모델하우스를 등록하면 여기에 표시됩니다</p>
+                            <h3 class="model-title">마포 럭셔리하우스</h3>
+                        </div>
+                    </div>
+                    
+                    <!-- 추가 카드들 -->
+                    <div class="carousel-item" data-model-id="4" data-lat="37.5665" data-lng="126.9780">
+                        <div class="model-preview">
+                            <div class="preview-image-container">
+                                <div class="preview-image modern-house">
+                                    <i class="fas fa-home"></i>
+                                    <div class="house-type">모던</div>
+                                </div>
+                            </div>
+                            <h3 class="model-title">신축 모던하우스</h3>
+                        </div>
+                    </div>
+                    
+                    <div class="carousel-item" data-model-id="5" data-lat="37.5248" data-lng="127.0400">
+                        <div class="model-preview">
+                            <div class="preview-image-container">
+                                <div class="preview-image traditional-house">
+                                    <i class="fas fa-home"></i>
+                                    <div class="house-type">전통</div>
+                                </div>
+                            </div>
+                            <h3 class="model-title">한옥 스타일하우스</h3>
                         </div>
                     </div>
                 </div>
