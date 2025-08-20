@@ -90,7 +90,19 @@ async function initMap() {
         try {
             mapOptions = {
                 center: new kakao.maps.LatLng(lat, lng),
-                level: 8
+                level: 8, // 기본 줌 레벨
+                minLevel: 1, // 최소 줌 레벨 (가장 멀리)
+                maxLevel: 19, // 최대 줌 레벨 (가장 가깝게)
+                draggable: true, // 드래그 가능
+                zoomable: true, // 줌 가능
+                scrollwheel: true, // 마우스 휠로 줌 가능
+                disableDoubleClickZoom: false, // 더블클릭 줌 활성화
+                disableDoubleTapZoom: false, // 더블탭 줌 활성화
+                zoomControl: true, // 줌 컨트롤 표시
+                mapTypeControl: false, // 지도 타입 컨트롤 숨김
+                scaleControl: true, // 축척 표시
+                keyboardShortcuts: true, // 키보드 단축키 활성화
+                zoomControlPosition: kakao.maps.ControlPosition.RIGHT // 줌 컨트롤 위치
             };
             console.log('지도 옵션 설정 성공:', mapOptions);
         } catch (latLngError) {
@@ -99,7 +111,18 @@ async function initMap() {
             try {
                 mapOptions = {
                     center: { lat: lat, lng: lng },
-                    level: 8
+                    level: 8,
+                    minLevel: 1,
+                    maxLevel: 19,
+                    draggable: true,
+                    zoomable: true,
+                    scrollwheel: true,
+                    disableDoubleClickZoom: false,
+                    disableDoubleTapZoom: false,
+                    zoomControl: true,
+                    mapTypeControl: false,
+                    scaleControl: true,
+                    keyboardShortcuts: true
                 };
                 console.log('대안 지도 옵션 사용:', mapOptions);
             } catch (altError) {
@@ -128,6 +151,38 @@ async function initMap() {
                 console.log('지도 타일 로딩 완료');
                 mapContainer.classList.add('loaded');
             });
+            
+            // 줌 변경 이벤트 (부드러운 줌을 위한 설정)
+            kakao.maps.event.addListener(map, 'zoom_changed', function() {
+                const currentLevel = map.getLevel();
+                console.log('현재 줌 레벨:', currentLevel);
+                
+                // 줌 레벨에 따른 마커 크기 조정 (선택사항)
+                if (markers.length > 0) {
+                    markers.forEach(marker => {
+                        if (currentLevel >= 15) {
+                            // 가까운 줌에서는 마커를 크게
+                            marker.setZIndex(1000);
+                        } else {
+                            // 먼 줌에서는 마커를 작게
+                            marker.setZIndex(100);
+                        }
+                    });
+                }
+            });
+            
+            // 줌 시작 이벤트
+            kakao.maps.event.addListener(map, 'zoom_start', function() {
+                console.log('줌 시작');
+                // 줌 중에는 마커 클릭 이벤트를 일시적으로 비활성화할 수 있음
+            });
+            
+            // 줌 완료 이벤트
+            kakao.maps.event.addListener(map, 'zoom_changed', function() {
+                console.log('줌 완료');
+                // 줌 완료 후 마커 클릭 이벤트 재활성화
+            });
+            
         } catch (eventError) {
             console.warn('지도 이벤트 리스너 추가 실패:', eventError);
         }
@@ -156,6 +211,53 @@ async function initMap() {
         console.error('오류 스택:', error.stack);
         showMapError();
     }
+}
+
+// 부드러운 줌 함수들
+function smoothZoomToLevel(targetLevel, duration = 500) {
+    if (!map) return;
+    
+    const currentLevel = map.getLevel();
+    const levelDiff = targetLevel - currentLevel;
+    const steps = Math.abs(levelDiff);
+    const stepTime = duration / steps;
+    
+    if (levelDiff === 0) return;
+    
+    let currentStep = 0;
+    const zoomInterval = setInterval(() => {
+        if (currentStep >= steps) {
+            clearInterval(zoomInterval);
+            return;
+        }
+        
+        const newLevel = currentLevel + (levelDiff > 0 ? 1 : -1);
+        map.setLevel(newLevel);
+        currentStep++;
+    }, stepTime);
+}
+
+function smoothZoomToLocation(lat, lng, targetLevel = 12, duration = 800) {
+    if (!map) return;
+    
+    const targetPosition = new kakao.maps.LatLng(lat, lng);
+    
+    // 먼저 위치로 이동
+    map.panTo(targetPosition);
+    
+    // 잠시 후 줌 레벨 조정
+    setTimeout(() => {
+        smoothZoomToLevel(targetLevel, duration);
+    }, 300);
+}
+
+function resetMapView() {
+    if (!map) return;
+    
+    // 기본 위치와 줌 레벨로 복원
+    const defaultPosition = new kakao.maps.LatLng(37.5665, 126.9780);
+    map.setCenter(defaultPosition);
+    map.setLevel(8);
 }
 
 // Kakao Maps API 로딩 대기

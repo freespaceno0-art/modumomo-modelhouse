@@ -183,6 +183,64 @@ h1, h2, h3, h4, h5, h6, p, span, div {
     transform: scale(0.95);
 }
 
+/* 지도 컨트롤 */
+.map-controls {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.map-control-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.9);
+    color: #333;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.map-control-btn:hover {
+    background: rgba(255, 255, 255, 1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.map-control-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.map-control-btn i {
+    pointer-events: none;
+}
+
+/* 줌 애니메이션 개선 */
+#map {
+    transition: all 0.3s ease;
+}
+
+/* 마커 줌 효과 */
+.marker-zoom-in {
+    transform: scale(1.2);
+    transition: transform 0.3s ease;
+}
+
+.marker-zoom-out {
+    transform: scale(0.8);
+    transition: transform 0.3s ease;
+}
+
 /* 지도 컨테이너 */
 .map-container {
     position: relative;
