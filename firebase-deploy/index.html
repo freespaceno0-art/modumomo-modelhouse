@@ -107,24 +107,50 @@
                     </div>
                     
                     <!-- 동적 모델하우스 카드 (백엔드 데이터 연동) -->
-                    <div th:each="modelHouse : ${recentModelHouses}" 
-                         th:class="'carousel-item'" 
-                         th:attr="data-model-id=${modelHouse.id}, data-lat=${modelHouse.latitude}, data-lng=${modelHouse.longitude}">
+                    <div class="carousel-item" data-model-id="4" data-lat="37.5665" data-lng="126.9780">
                         <div class="model-preview">
                             <div class="preview-image-container">
-                                <div class="preview-image" th:class="${modelHouse.houseCategory == '아파트' ? 'modern-house' : modelHouse.houseCategory == '오피스텔' ? 'luxury-house' : 'traditional-house'}">
+                                <div class="preview-image modern-house">
                                     <i class="fas fa-home"></i>
-                                    <div class="house-type" th:text="${modelHouse.houseCategory}">카테고리</div>
+                                    <div class="house-type">아파트</div>
                                 </div>
                             </div>
-                            <h3 class="model-title" th:text="${modelHouse.houseName}">모델하우스명</h3>
-                            <p class="model-price" th:text="${modelHouse.housePrice}">가격</p>
-                            <p class="model-address" th:text="${modelHouse.houseAddress}">주소</p>
+                            <h3 class="model-title">서울숲 모던하우스</h3>
+                            <p class="model-price">5억원</p>
+                            <p class="model-address">서울특별시 성동구 서울숲2길 18</p>
                         </div>
                     </div>
                     
-                    <!-- 데이터가 없을 경우 기본 카드 표시 -->
-                    <div th:if="${#lists.isEmpty(recentModelHouses)}" class="carousel-item" data-model-id="1" data-lat="37.5665" data-lng="126.9780">
+                    <div class="carousel-item" data-model-id="5" data-lat="37.5248" data-lng="127.0400">
+                        <div class="model-preview">
+                            <div class="preview-image-container">
+                                <div class="preview-image luxury-house">
+                                    <i class="fas fa-home"></i>
+                                    <div class="house-type">오피스텔</div>
+                                </div>
+                            </div>
+                            <h3 class="model-title">강남 프리미엄 오피스텔</h3>
+                            <p class="model-price">3억원</p>
+                            <p class="model-address">서울특별시 강남구 테헤란로 123</p>
+                        </div>
+                    </div>
+                    
+                    <div class="carousel-item" data-model-id="6" data-lat="37.5563" data-lng="126.9236">
+                        <div class="model-preview">
+                            <div class="preview-image-container">
+                                <div class="preview-image traditional-house">
+                                    <i class="fas fa-home"></i>
+                                    <div class="house-type">상가</div>
+                                </div>
+                            </div>
+                            <h3 class="model-title">홍대 창업 오피스</h3>
+                            <p class="model-price">2억원</p>
+                            <p class="model-address">서울특별시 마포구 홍대로 123</p>
+                        </div>
+                    </div>
+                    
+                    <!-- 추가 샘플 카드 -->
+                    <div class="carousel-item" data-model-id="7" data-lat="37.5665" data-lng="126.9780">
                         <div class="model-preview">
                             <div class="preview-image-container">
                                 <div class="preview-image modern-house">
@@ -132,7 +158,9 @@
                                     <div class="house-type">모던</div>
                                 </div>
                             </div>
-                            <h3 class="model-title">샘플 모델하우스</h3>
+                            <h3 class="model-title">신축 모던하우스</h3>
+                            <p class="model-price">4억원</p>
+                            <p class="model-address">서울특별시 강남구</p>
                         </div>
                     </div>
                 </div>
@@ -144,10 +172,10 @@
     <script>
         // 페이지 로드 시 인증 상태 확인
         document.addEventListener('DOMContentLoaded', function() {
-            // Thymeleaf에서 전달받은 사용자 정보로 UI 업데이트
-            const isLoggedIn = /*[[${isLoggedIn}]]*/ false;
-            const isAdmin = /*[[${isAdmin}]]*/ false;
-            const currentUser = /*[[${currentUser}]]*/ null;
+            // Firebase Hosting용 정적 인증 상태 (기본값: 비로그인)
+            const isLoggedIn = false;
+            const isAdmin = false;
+            const currentUser = null;
             
             updateAuthUI(isLoggedIn, isAdmin, currentUser);
         });
