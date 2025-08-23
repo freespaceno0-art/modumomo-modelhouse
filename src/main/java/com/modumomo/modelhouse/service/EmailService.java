@@ -3,11 +3,11 @@ package com.modumomo.modelhouse.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-// import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Service;
 
 import java.util.Random;
 
-// @Service
+@Service
 public class EmailService {
 
     @Autowired
@@ -47,6 +47,33 @@ public class EmailService {
         }
         
         return verificationCode;
+    }
+
+    /**
+     * 비밀번호 재설정 이메일을 발송합니다.
+     * @param email 수신자 이메일
+     * @param resetToken 비밀번호 재설정 토큰
+     * @return 발송 성공 여부
+     */
+    public boolean sendPasswordResetEmail(String email, String resetToken) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(email);
+            message.setSubject("[모두의 모델하우스] 비밀번호 재설정");
+            message.setText("안녕하세요!\n\n모두의 모델하우스 비밀번호 재설정 요청입니다.\n\n" +
+                    "비밀번호를 재설정하려면 아래 링크를 클릭하세요:\n\n" +
+                    "http://localhost:8080/reset-password?token=" + resetToken + "\n\n" +
+                    "이 링크는 1시간간 유효합니다.\n" +
+                    "본인이 요청하지 않은 경우 무시하셔도 됩니다.\n\n" +
+                    "감사합니다.\n모두의 모델하우스 팀");
+            
+            mailSender.send(message);
+            System.out.println("✅ 비밀번호 재설정 이메일 발송 성공!");
+            return true;
+        } catch (Exception e) {
+            System.out.println("⚠️ 비밀번호 재설정 이메일 발송 실패: " + e.getMessage());
+            return false;
+        }
     }
 
     /**

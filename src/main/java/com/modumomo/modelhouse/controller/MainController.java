@@ -74,6 +74,20 @@ public class MainController {
         return "signup";
     }
     
+    @GetMapping("/search")
+    public String search(@RequestParam(required = false) String q, Model model) {
+        model.addAttribute("title", "Modumomo - 검색");
+        addUserInfoToModel(model);
+        return "redirect:/search?q=" + (q != null ? q : "");
+    }
+    
+    @GetMapping("/test")
+    public String test(Model model) {
+        model.addAttribute("title", "Modumomo - 기능 테스트");
+        addUserInfoToModel(model);
+        return "test";
+    }
+    
     // 모델하우스 데이터 API 엔드포인트
     @GetMapping("/api/modelhouses")
     @ResponseBody

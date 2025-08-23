@@ -53,12 +53,13 @@
         <!-- Search Section -->
         <section class="search-section">
             <div class="search-container">
-                <input type="text" class="search-input" placeholder="찾아보기">
-                <button class="search-btn">
-                    <i class="fas fa-search"></i>
-                </button>
+                <form action="/search" method="get" style="display: flex; width: 100%;">
+                    <input type="text" name="q" class="search-input" placeholder="지역명, 모델하우스명, 카테고리를 입력하세요...">
+                    <button type="submit" class="search-btn">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
             </div>
-
         </section>
 
         <!-- Model House Carousel Section -->
@@ -105,8 +106,25 @@
                         </div>
                     </div>
                     
-                    <!-- 추가 카드들 -->
-                    <div class="carousel-item" data-model-id="4" data-lat="37.5665" data-lng="126.9780">
+                    <!-- 동적 모델하우스 카드 (백엔드 데이터 연동) -->
+                    <div th:each="modelHouse : ${recentModelHouses}" 
+                         th:class="'carousel-item'" 
+                         th:attr="data-model-id=${modelHouse.id}, data-lat=${modelHouse.latitude}, data-lng=${modelHouse.longitude}">
+                        <div class="model-preview">
+                            <div class="preview-image-container">
+                                <div class="preview-image" th:class="${modelHouse.houseCategory == '아파트' ? 'modern-house' : modelHouse.houseCategory == '오피스텔' ? 'luxury-house' : 'traditional-house'}">
+                                    <i class="fas fa-home"></i>
+                                    <div class="house-type" th:text="${modelHouse.houseCategory}">카테고리</div>
+                                </div>
+                            </div>
+                            <h3 class="model-title" th:text="${modelHouse.houseName}">모델하우스명</h3>
+                            <p class="model-price" th:text="${modelHouse.housePrice}">가격</p>
+                            <p class="model-address" th:text="${modelHouse.houseAddress}">주소</p>
+                        </div>
+                    </div>
+                    
+                    <!-- 데이터가 없을 경우 기본 카드 표시 -->
+                    <div th:if="${#lists.isEmpty(recentModelHouses)}" class="carousel-item" data-model-id="1" data-lat="37.5665" data-lng="126.9780">
                         <div class="model-preview">
                             <div class="preview-image-container">
                                 <div class="preview-image modern-house">
@@ -114,19 +132,7 @@
                                     <div class="house-type">모던</div>
                                 </div>
                             </div>
-                            <h3 class="model-title">신축 모던하우스</h3>
-                        </div>
-                    </div>
-                    
-                    <div class="carousel-item" data-model-id="5" data-lat="37.5248" data-lng="127.0400">
-                        <div class="model-preview">
-                            <div class="preview-image-container">
-                                <div class="preview-image traditional-house">
-                                    <i class="fas fa-home"></i>
-                                    <div class="house-type">전통</div>
-                                </div>
-                            </div>
-                            <h3 class="model-title">한옥 스타일하우스</h3>
+                            <h3 class="model-title">샘플 모델하우스</h3>
                         </div>
                     </div>
                 </div>
@@ -135,28 +141,28 @@
     </main>
 
     <script src="/js/script.js"></script>
-    <script src="/js/auth-simulator.js"></script>
     <script>
         // 페이지 로드 시 인증 상태 확인
         document.addEventListener('DOMContentLoaded', function() {
-            checkAuthStatus();
+            // Thymeleaf에서 전달받은 사용자 정보로 UI 업데이트
+            const isLoggedIn = /*[[${isLoggedIn}]]*/ false;
+            const isAdmin = /*[[${isAdmin}]]*/ false;
+            const currentUser = /*[[${currentUser}]]*/ null;
+            
+            updateAuthUI(isLoggedIn, isAdmin, currentUser);
         });
         
-        // 인증 상태 확인 및 버튼 표시 함수
-        function checkAuthStatus() {
-            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-            const isAdmin = localStorage.getItem('isAdmin') === 'true';
-            const currentUsername = localStorage.getItem('username') || '사용자';
-            
+        // 인증 상태에 따른 UI 업데이트 함수
+        function updateAuthUI(isLoggedIn, isAdmin, currentUser) {
             const guestButtons = document.getElementById('guestButtons');
             const userButtons = document.getElementById('userButtons');
             const adminSection = document.getElementById('adminSection');
             const usernameSpan = document.getElementById('username');
             
-            if (isLoggedIn) {
+            if (isLoggedIn && currentUser) {
                 guestButtons.style.display = 'none';
                 userButtons.style.display = 'block';
-                usernameSpan.textContent = currentUsername;
+                usernameSpan.textContent = currentUser;
                 
                 if (isAdmin) {
                     adminSection.style.display = 'block';

@@ -102,7 +102,15 @@ async function initMap() {
                 mapTypeControl: false, // 지도 타입 컨트롤 숨김
                 scaleControl: true, // 축척 표시
                 keyboardShortcuts: true, // 키보드 단축키 활성화
-                zoomControlPosition: kakao.maps.ControlPosition.RIGHT // 줌 컨트롤 위치
+                zoomControlPosition: kakao.maps.ControlPosition.RIGHT, // 줌 컨트롤 위치
+                // 타일 로딩 개선을 위한 옵션들
+                tileAnimation: true, // 타일 애니메이션 활성화
+                tileAnimationDuration: 300, // 타일 애니메이션 지속 시간 (ms)
+                tileAnimationEasing: 'ease-out', // 타일 애니메이션 이징
+                // 줌 애니메이션 개선
+                zoomAnimation: true, // 줌 애니메이션 활성화
+                zoomAnimationDuration: 400, // 줌 애니메이션 지속 시간 (ms)
+                zoomAnimationEasing: 'ease-out' // 줌 애니메이션 이징
             };
             console.log('지도 옵션 설정 성공:', mapOptions);
         } catch (latLngError) {
@@ -122,7 +130,13 @@ async function initMap() {
                     zoomControl: true,
                     mapTypeControl: false,
                     scaleControl: true,
-                    keyboardShortcuts: true
+                    keyboardShortcuts: true,
+                    tileAnimation: true,
+                    tileAnimationDuration: 300,
+                    tileAnimationEasing: 'ease-out',
+                    zoomAnimation: true,
+                    zoomAnimationDuration: 400,
+                    zoomAnimationEasing: 'ease-out'
                 };
                 console.log('대안 지도 옵션 사용:', mapOptions);
             } catch (altError) {
@@ -150,6 +164,24 @@ async function initMap() {
             kakao.maps.event.addListener(map, 'tilesloaded', function() {
                 console.log('지도 타일 로딩 완료');
                 mapContainer.classList.add('loaded');
+                
+                // 로딩 스피너 숨기기
+                const spinner = document.querySelector('.loading-spinner');
+                if (spinner) {
+                    spinner.style.display = 'none';
+                }
+            });
+            
+            // 타일 로딩 시작 이벤트
+            kakao.maps.event.addListener(map, 'tilesloading', function() {
+                console.log('지도 타일 로딩 시작');
+                mapContainer.classList.remove('loaded');
+                
+                // 로딩 스피너 표시
+                const spinner = document.querySelector('.loading-spinner');
+                if (spinner) {
+                    spinner.style.display = 'block';
+                }
             });
             
             // 줌 변경 이벤트 (부드러운 줌을 위한 설정)
@@ -174,13 +206,38 @@ async function initMap() {
             // 줌 시작 이벤트
             kakao.maps.event.addListener(map, 'zoom_start', function() {
                 console.log('줌 시작');
-                // 줌 중에는 마커 클릭 이벤트를 일시적으로 비활성화할 수 있음
+                // 줌 중에는 로딩 스피너 표시
+                const spinner = document.querySelector('.loading-spinner');
+                if (spinner) {
+                    spinner.style.display = 'block';
+                }
             });
             
             // 줌 완료 이벤트
             kakao.maps.event.addListener(map, 'zoom_changed', function() {
                 console.log('줌 완료');
-                // 줌 완료 후 마커 클릭 이벤트 재활성화
+                // 줌 완료 후 잠시 후 로딩 스피너 숨기기
+                setTimeout(() => {
+                    const spinner = document.querySelector('.loading-spinner');
+                    if (spinner) {
+                        spinner.style.display = 'none';
+                    }
+                }, 500);
+            });
+            
+            // 지도 이동 시작 이벤트
+            kakao.maps.event.addListener(map, 'dragstart', function() {
+                console.log('지도 이동 시작');
+                mapContainer.classList.remove('loaded');
+            });
+            
+            // 지도 이동 완료 이벤트
+            kakao.maps.event.addListener(map, 'dragend', function() {
+                console.log('지도 이동 완료');
+                // 이동 완료 후 잠시 후 loaded 클래스 추가
+                setTimeout(() => {
+                    mapContainer.classList.add('loaded');
+                }, 300);
             });
             
         } catch (eventError) {
@@ -214,50 +271,104 @@ async function initMap() {
 }
 
 // 부드러운 줌 함수들
-function smoothZoomToLevel(targetLevel, duration = 500) {
+function smoothZoomToLevel(targetLevel, duration = 800) {
     if (!map) return;
     
     const currentLevel = map.getLevel();
     const levelDiff = targetLevel - currentLevel;
-    const steps = Math.abs(levelDiff);
-    const stepTime = duration / steps;
     
     if (levelDiff === 0) return;
+    
+    // 더 부드러운 줌을 위해 더 작은 단계로 나누기
+    const steps = Math.min(Math.abs(levelDiff) * 2, 20); // 최대 20단계로 제한
+    const stepTime = duration / steps;
     
     let currentStep = 0;
     const zoomInterval = setInterval(() => {
         if (currentStep >= steps) {
             clearInterval(zoomInterval);
+            // 최종 레벨로 정확히 설정
+            map.setLevel(targetLevel);
             return;
         }
         
-        const newLevel = currentLevel + (levelDiff > 0 ? 1 : -1);
-        map.setLevel(newLevel);
+        // 이징 함수를 사용한 부드러운 진행
+        const progress = currentStep / steps;
+        const easedProgress = easeOutCubic(progress);
+        const newLevel = currentLevel + (levelDiff * easedProgress);
+        
+        map.setLevel(Math.round(newLevel));
         currentStep++;
     }, stepTime);
 }
 
-function smoothZoomToLocation(lat, lng, targetLevel = 12, duration = 800) {
+// 이징 함수들
+function easeOutCubic(t) {
+    return 1 - Math.pow(1 - t, 3);
+}
+
+function easeInOutCubic(t) {
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
+function smoothZoomToLocation(lat, lng, targetLevel = 12, duration = 1200) {
     if (!map) return;
     
     const targetPosition = new kakao.maps.LatLng(lat, lng);
     
-    // 먼저 위치로 이동
-    map.panTo(targetPosition);
+    // 부드러운 이동과 줌을 순차적으로 실행
+    // 1단계: 위치로 부드럽게 이동
+    map.panTo(targetPosition, { duration: duration * 0.6 });
     
-    // 잠시 후 줌 레벨 조정
+    // 2단계: 이동 완료 후 줌 레벨 조정
     setTimeout(() => {
-        smoothZoomToLevel(targetLevel, duration);
-    }, 300);
+        smoothZoomToLevel(targetLevel, duration * 0.4);
+    }, duration * 0.6);
 }
 
 function resetMapView() {
     if (!map) return;
     
-    // 기본 위치와 줌 레벨로 복원
+    // 기본 위치와 줌 레벨로 부드럽게 복원
     const defaultPosition = new kakao.maps.LatLng(37.5665, 126.9780);
-    map.setCenter(defaultPosition);
-    map.setLevel(8);
+    map.panTo(defaultPosition, { duration: 600 });
+    
+    setTimeout(() => {
+        smoothZoomToLevel(8, 400);
+    }, 300);
+}
+
+// 타일 깨짐 방지를 위한 줌 제한 함수
+function safeZoomToLevel(targetLevel) {
+    if (!map) return;
+    
+    // 줌 레벨 범위 제한
+    const safeLevel = Math.max(1, Math.min(19, targetLevel));
+    const currentLevel = map.getLevel();
+    
+    // 급격한 줌 변화 방지
+    const maxJump = 3;
+    if (Math.abs(safeLevel - currentLevel) > maxJump) {
+        // 단계적으로 줌
+        const direction = safeLevel > currentLevel ? 1 : -1;
+        const steps = Math.ceil(Math.abs(safeLevel - currentLevel) / maxJump);
+        
+        let step = 0;
+        const stepZoom = setInterval(() => {
+            if (step >= steps) {
+                clearInterval(stepZoom);
+                map.setLevel(safeLevel);
+                return;
+            }
+            
+            const nextLevel = currentLevel + (direction * maxJump * (step + 1));
+            map.setLevel(Math.min(safeLevel, Math.max(1, nextLevel)));
+            step++;
+        }, 200);
+    } else {
+        // 안전한 범위 내에서는 직접 줌
+        map.setLevel(safeLevel);
+    }
 }
 
 // Kakao Maps API 로딩 대기
