@@ -242,12 +242,46 @@
             onerror="window.kakaoMapsErrorCallback()"></script>
     
     <script>
+        // 인증 상태에 따른 UI 업데이트 함수
+        function updateAuthUI(isLoggedIn, isAdmin, currentUser) {
+            const loginBtn = document.getElementById('loginBtn');
+            const signupBtn = document.getElementById('signupBtn');
+            const separator = document.getElementById('separator');
+            const adminBtn = document.getElementById('adminBtn');
+            const userInfo = document.getElementById('userInfo');
+            const username = document.getElementById('username');
+            
+            if (isLoggedIn && currentUser) {
+                loginBtn.style.display = 'none';
+                signupBtn.style.display = 'none';
+                separator.style.display = 'inline';
+                userInfo.style.display = 'inline';
+                username.textContent = currentUser;
+                
+                if (isAdmin) {
+                    adminBtn.style.display = 'inline';
+                } else {
+                    adminBtn.style.display = 'none';
+                }
+            } else {
+                loginBtn.style.display = 'inline';
+                signupBtn.style.display = 'inline';
+                separator.style.display = 'none';
+                adminBtn.style.display = 'none';
+                userInfo.style.display = 'none';
+            }
+        }
+        
         // 페이지 로드 완료 후 지도 초기화
         window.addEventListener('load', function() {
             console.log('페이지 로드 완료, 지도 초기화 시작');
             
-            // 인증 상태 확인 및 버튼 표시
-            checkAuthStatus();
+            // Thymeleaf에서 전달받은 사용자 정보로 UI 업데이트
+            const isLoggedIn = /*[[${isLoggedIn}]]*/ false;
+            const isAdmin = /*[[${isAdmin}]]*/ false;
+            const currentUser = /*[[${currentUser}]]*/ null;
+            
+            updateAuthUI(isLoggedIn, isAdmin, currentUser);
             
             // 이미 초기화되었다면 건너뛰기
             if (window.mapInitialized) {
@@ -308,6 +342,24 @@
         });
     </script>
     <script src="/js/map.js"></script>
-    <script src="/js/auth-simulator.js"></script>
+    
+    <!-- 백엔드 데이터 연동 스크립트 -->
+    <script th:inline="javascript">
+        // 백엔드에서 전달받은 모델하우스 데이터
+        const modelHousesData = /*[[${modelHouses}]]*/ [];
+        
+        // 페이지 로드 시 모델하우스 데이터를 지도에 표시
+        window.addEventListener('load', function() {
+            if (modelHousesData && modelHousesData.length > 0) {
+                console.log('백엔드 데이터 로드됨:', modelHousesData.length + '개의 모델하우스');
+                // 지도 초기화 후 마커 추가
+                if (window.addModelHouseMarkers) {
+                    window.addModelHouseMarkers(modelHousesData);
+                }
+            } else {
+                console.log('백엔드 데이터가 없습니다.');
+            }
+        });
+    </script>
 </body>
 </html>

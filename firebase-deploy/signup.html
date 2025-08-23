@@ -25,6 +25,7 @@
                 <p class="auth-subtitle">새로운 계정을 만들어보세요</p>
                 
                 <form id="signupForm" class="form" method="post" action="/signup">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                     <div class="form-group">
                         <label for="username">사용자명 *</label>
                         <div class="input-group">
